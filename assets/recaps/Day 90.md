@@ -1,0 +1,3 @@
+# 6 days until DCMP
+
+- We continued working on the dumper and made a little progress. CAD finished the design (or at least they thought they had) early in the morning so we cut plates today (super late in the day). So tomorrow should lead to more progress on getting it finished. We are planning to bring Goldfire 1.0 to states at this point but if the dumper turns on tomorrow, that could easily change. 

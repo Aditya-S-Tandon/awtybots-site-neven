@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Recaps · AwtyBots FRC 5829</title>
+  <link rel="icon" type="image/x-icon" href="assets/images/icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Saira:wght@500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="assets/css/site.css" rel="stylesheet">
+  <style>
+    .recap-nav { display:flex; gap:.6rem; align-items:center; flex-wrap:wrap; margin-bottom:1.2rem; }
+    .recap-nav button { background:var(--surface); border:1px solid var(--line); color:var(--text); border-radius:8px; padding:.45rem .9rem; font-family:var(--font-body); font-size:.9rem; cursor:pointer; transition:background .2s,border-color .2s; }
+    .recap-nav button:hover { background:var(--green); border-color:var(--green); color:#000; }
+    .recap-day-select { display:flex; gap:.75rem; align-items:center; margin-bottom:1.4rem; }
+    .recap-day-select label { color:var(--muted); font-size:.9rem; }
+    .recap-day-select input { background:var(--surface); border:1px solid var(--line); color:var(--text); border-radius:8px; padding:.4rem .8rem; font-family:var(--font-mono); font-size:.9rem; width:80px; }
+    #post { color:var(--text); line-height:1.8; }
+    #post img { max-width:250px; width:100%; height:auto; display:inline-block; margin:.75rem .5rem .75rem 0; border-radius:8px; }
+    #post p { display:flex; flex-wrap:wrap; gap:.5rem; align-items:flex-start; }
+    #post h1,#post h2,#post h3 { font-family:var(--font-display); color:var(--green); margin:1.2rem 0 .6rem; }
+    #post a { color:var(--green); }
+    #post hr { border:none; border-top:1px solid var(--line); margin:1.5rem 0; }
+    #post ul,#post ol { padding-left:1.4rem; color:var(--muted); }
+    #post ul li::marker,#post ol li::marker { color:var(--green); }
+  </style>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <div class="wrap nav__in">
+    <a class="brand" href="index.html"><img src="assets/images/logo.png" alt="AwtyBots Logo"><span><b>AWTY<span>BOTS</span></b><small>FRC 5829</small></span></a>
+    <nav class="nav__links" id="navlinks" aria-label="Primary">
+      <a href="index.html">Home</a>
+      <a href="robots.html">Robots</a>
+      <a href="recaps.html" aria-current="page">Recaps</a>
+      <a href="events.html">Events</a>
+      <a href="outreach.html">Resources</a>
+      <a class="btn btn--solid nav__cta" href="index.html#join">Join Us</a>
+    </nav>
+    <button class="nav__toggle" id="navtoggle" aria-label="Open menu" aria-expanded="false" aria-controls="navlinks">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+  </div>
+</header>
+
+<section class="section" style="padding-top:6rem;padding-bottom:2rem;text-align:center;">
+  <div class="wrap">
+    <h1 style="font-family:var(--font-display);font-size:clamp(2rem,5vw,3.5rem);font-weight:800;margin-bottom:.75rem;">Meeting Recaps</h1>
+    <p style="color:var(--muted);font-size:1.1rem;">Our 2026 build-season recaps — follow along with our progress day by day.</p>
+  </div>
+</section>
+
+<section class="section" style="padding-top:1rem;">
+  <div class="wrap" id="translate-content">
+
+    <div class="recap-nav">
+      <button id="back-all">&#8676; First</button>
+      <button id="back">&#8592; Prev</button>
+      <button id="next">Next &#8594;</button>
+      <button id="next-all">Last &#8677;</button>
+    </div>
+
+    <div class="recap-day-select">
+      <label for="pages">Jump to day:</label>
+      <input type="text" name="pages" id="pages">
+    </div>
+
+    <div id="post"></div>
+
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="wrap foot__in">
+    <p>AwtyBots · FRC Team 5829 © 2015–2026<br>awtyrobotics@gmail.com · Houston, TX</p>
+    <p>Live data: <a href="https://www.thebluealliance.com/team/5829" target="_blank">The Blue Alliance</a> · <a href="https://frc-events.firstinspires.org/team/5829" target="_blank">FIRST</a><br>Site maintained by the AwtyBots · <a href="#">Back to top ↑</a></p>
+  </div>
+</footer>
+<script src="assets/js/site.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="assets/js/recaps.js"></script>
+
+</body>
+</html>

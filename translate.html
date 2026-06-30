@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Project Translate · AwtyBots FRC 5829</title>
+  <link rel="icon" type="image/x-icon" href="assets/images/icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Saira:wght@500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="assets/css/site.css" rel="stylesheet">
+  <style>
+    .translate-grid { display:grid; grid-template-columns:1fr; gap:2rem; }
+    @media(min-width:768px) { .translate-grid { grid-template-columns:1fr 280px; } }
+    .lang-select-wrap { display:flex; flex-direction:column; gap:.5rem; margin-bottom:1.8rem; }
+    .lang-select-wrap label { color:var(--muted); font-size:.9rem; font-family:var(--font-display); }
+    .lang-select-wrap select { background:var(--surface); border:1px solid var(--line); color:var(--text); border-radius:8px; padding:.55rem .9rem; font-family:var(--font-body); font-size:.95rem; cursor:pointer; }
+    .lang-select-wrap select:focus { outline:none; border-color:var(--green); }
+    #translate-documents a { display:block; padding:.7rem 1rem; border:1px solid var(--line); border-radius:8px; background:var(--surface); color:var(--green); text-decoration:none; margin-bottom:.6rem; font-family:var(--font-display); font-size:.95rem; transition:border-color .2s,background .2s; }
+    #translate-documents a:hover { border-color:var(--green); background:rgba(61,220,111,.06); }
+    .credits-box { border:1px solid var(--line); border-radius:14px; padding:1.6rem; background:var(--surface); }
+    .credits-box h3 { font-family:var(--font-display); font-size:1.05rem; font-weight:700; margin-bottom:1rem; color:var(--gold); }
+    .credits-box ul { list-style:none; display:flex; flex-direction:column; gap:.5rem; color:var(--muted); font-size:.9rem; line-height:1.6; }
+  </style>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <div class="wrap nav__in">
+    <a class="brand" href="index.html"><img src="assets/images/logo.png" alt="AwtyBots Logo"><span><b>AWTY<span>BOTS</span></b><small>FRC 5829</small></span></a>
+    <nav class="nav__links" id="navlinks" aria-label="Primary">
+      <a href="index.html">Home</a>
+      <a href="robots.html">Robots</a>
+      <a href="recaps.html">Recaps</a>
+      <a href="events.html">Events</a>
+      <a href="outreach.html" aria-current="page">Resources</a>
+      <a class="btn btn--solid nav__cta" href="index.html#join">Join Us</a>
+    </nav>
+    <button class="nav__toggle" id="navtoggle" aria-label="Open menu" aria-expanded="false" aria-controls="navlinks">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+  </div>
+</header>
+
+<section class="section" style="padding-top:6rem;padding-bottom:2rem;text-align:center;">
+  <div class="wrap" style="max-width:760px;">
+    <h1 style="font-family:var(--font-display);font-size:clamp(2rem,5vw,3.5rem);font-weight:800;margin-bottom:.75rem;color:var(--gold);">Project Translate</h1>
+    <p style="color:var(--muted);font-size:1.05rem;line-height:1.7;">As an international school, we are fortunate to have access to students who speak a wide range of languages. We believe it is our responsibility to give back to the community by expanding access to robotics resources. To do this, we are translating valuable robotics documents into underrepresented languages.</p>
+  </div>
+</section>
+
+<section class="section" style="padding-top:1rem;">
+  <div class="wrap">
+    <div class="translate-grid">
+
+      <div id="translate-content">
+        <div class="lang-select-wrap">
+          <label for="languages">Select Language</label>
+          <select name="languages" id="languages">
+            <option value="Spanish" selected>Español (Spanish)</option>
+            <option value="French">Français (French)</option>
+            <option value="Portuguese">Português (Portuguese)</option>
+            <option value="Mandarin">汉语 (Mandarin)</option>
+            <option value="Japanese">日本語 (Japanese)</option>
+            <option value="Arabic">عربي (Arabic)</option>
+            <option value="Tamil">தமிழ் (Tamil)</option>
+            <option value="Thai">แบบไทย (Thai)</option>
+          </select>
+        </div>
+
+        <div id="translate-documents"></div>
+      </div>
+
+      <aside>
+        <div class="credits-box">
+          <h3>Credits</h3>
+          <p style="color:var(--muted);font-size:.9rem;margin-bottom:1rem;">A special thank you to everyone who made Project Translate possible!</p>
+          <ul>
+            <li>Kasey R. and Martina M. — Spanish documents</li>
+            <li>Léane T. and Mark Y. — French documents</li>
+            <li>Mariah S. — Portuguese documents</li>
+            <li>David C. — Mandarin documents</li>
+            <li>Salim C. — Arabic documents</li>
+            <li>Medha S. — Tamil documents</li>
+            <li>Chanya M. — Thai documents</li>
+            <li>3481 Bronc Botz — for inspiring Project Translate!</li>
+          </ul>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="wrap foot__in">
+    <p>AwtyBots · FRC Team 5829 © 2015–2026<br>awtyrobotics@gmail.com · Houston, TX</p>
+    <p>Live data: <a href="https://www.thebluealliance.com/team/5829" target="_blank">The Blue Alliance</a> · <a href="https://frc-events.firstinspires.org/team/5829" target="_blank">FIRST</a><br>Site maintained by the AwtyBots · <a href="#">Back to top ↑</a></p>
+  </div>
+</footer>
+<script src="assets/js/site.js"></script>
+<script src="assets/js/translate.js"></script>
+
+</body>
+</html>

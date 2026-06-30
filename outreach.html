@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Resources · AwtyBots FRC 5829</title>
+  <link rel="icon" type="image/x-icon" href="assets/images/icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Saira:wght@500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="assets/css/site.css" rel="stylesheet">
+  <style>
+    .resource-card { border:1px solid var(--line); border-radius:14px; padding:1.8rem 2rem; background:var(--surface); margin-bottom:1.4rem; }
+    .resource-card h3 { font-family:var(--font-display); font-size:1.25rem; font-weight:700; margin-bottom:.6rem; }
+    .resource-card p { color:var(--muted); margin-bottom:1rem; }
+    .resource-card a.card-link { color:var(--green); font-family:var(--font-display); font-weight:600; text-decoration:none; }
+    .resource-card a.card-link:hover { text-decoration:underline; }
+    .social-list { list-style:none; display:flex; flex-direction:column; gap:.6rem; }
+    .social-list a { display:flex; align-items:center; gap:.9rem; padding:.75rem 1rem; border-radius:10px; border:1px solid var(--line); background:var(--surface); text-decoration:none; color:var(--text); transition:border-color .2s,background .2s; }
+    .social-list a:hover { border-color:var(--green); background:rgba(61,220,111,.06); }
+    .social-list img { width:36px; height:36px; object-fit:contain; border-radius:6px; }
+    .social-list span { font-family:var(--font-display); font-size:.95rem; font-weight:600; color:var(--green); }
+    .resources-grid { display:grid; grid-template-columns:1fr; gap:2rem; }
+    @media(min-width:768px) { .resources-grid { grid-template-columns:1fr 280px; } }
+  </style>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <div class="wrap nav__in">
+    <a class="brand" href="index.html"><img src="assets/images/logo.png" alt="AwtyBots Logo"><span><b>AWTY<span>BOTS</span></b><small>FRC 5829</small></span></a>
+    <nav class="nav__links" id="navlinks" aria-label="Primary">
+      <a href="index.html">Home</a>
+      <a href="robots.html">Robots</a>
+      <a href="recaps.html">Recaps</a>
+      <a href="events.html">Events</a>
+      <a href="outreach.html" aria-current="page">Resources</a>
+      <a class="btn btn--solid nav__cta" href="index.html#join">Join Us</a>
+    </nav>
+    <button class="nav__toggle" id="navtoggle" aria-label="Open menu" aria-expanded="false" aria-controls="navlinks">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+  </div>
+</header>
+
+<section class="section" style="padding-top:6rem;padding-bottom:2rem;text-align:center;">
+  <div class="wrap">
+    <h1 style="font-family:var(--font-display);font-size:clamp(2rem,5vw,3.5rem);font-weight:800;margin-bottom:.75rem;">Resources</h1>
+    <p style="color:var(--muted);font-size:1.1rem;">Community initiatives and materials from the AwtyBots.</p>
+  </div>
+</section>
+
+<section class="section" style="padding-top:1rem;">
+  <div class="wrap">
+    <div class="resources-grid">
+
+      <div id="outreach-content">
+        <div class="resource-card">
+          <h3 style="color:var(--gold);">Project Translate</h3>
+          <p>Project Translate is our mission to transcribe different FRC documents into various languages, to make robotics available to anyone.</p>
+          <a class="card-link" href="translate.html">View Project Translate &rarr;</a>
+        </div>
+
+        <div class="resource-card">
+          <h3 style="color:var(--green);">Belt Organizers</h3>
+          <p>Our solution to organize belts within our lab, and how you can implement them!</p>
+          <a class="card-link" href="belts.html">View Belt Organizer Instructions &rarr;</a>
+        </div>
+      </div>
+
+      <aside>
+        <h3 style="font-family:var(--font-display);font-size:1.1rem;font-weight:700;margin-bottom:1rem;color:var(--muted);">Find Us Online</h3>
+        <ul class="social-list">
+          <li>
+            <a href="https://www.youtube.com/@Awtybots5829" target="_blank">
+              <img src="assets/images/youtube.png" alt="YouTube">
+              <span>YouTube</span>
+            </a>
+          </li>
+          <li>
+            <a href="https://www.instagram.com/awtybots5829/" target="_blank">
+              <img src="assets/images/instagram.png" alt="Instagram">
+              <span>Instagram</span>
+            </a>
+          </li>
+          <li>
+            <a href="https://github.com/awtybots" target="_blank">
+              <img src="assets/images/github.png" alt="GitHub">
+              <span>GitHub</span>
+            </a>
+          </li>
+          <li>
+            <a href="https://www.facebook.com/AwtyBots5829/" target="_blank">
+              <img src="assets/images/facebook.png" alt="Facebook">
+              <span>Facebook</span>
+            </a>
+          </li>
+        </ul>
+      </aside>
+
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="wrap foot__in">
+    <p>AwtyBots · FRC Team 5829 © 2015–2026<br>awtyrobotics@gmail.com · Houston, TX</p>
+    <p>Live data: <a href="https://www.thebluealliance.com/team/5829" target="_blank">The Blue Alliance</a> · <a href="https://frc-events.firstinspires.org/team/5829" target="_blank">FIRST</a><br>Site maintained by the AwtyBots · <a href="#">Back to top ↑</a></p>
+  </div>
+</footer>
+<script src="assets/js/site.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,1404 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AwtyBots · FRC Team 5829 · Awty International School</title>
+  <meta name="description" content="The AwtyBots — FIRST Robotics Competition Team 5829 at Awty International School in Houston, Texas.">
+  <meta name="theme-color" content="#0a0e0c">
+  <link rel="icon" type="image/x-icon" href="assets/images/icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Saira:wght@500;600;700;800;900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="assets/css/site.css" rel="stylesheet">
+
+  <style>
+    /* ── SCROLL VIDEO HERO ────────────────────────── */
+    /* Spacer that creates the scroll travel zone */
+    .svid-wrap {
+      height: 280vh;
+    }
+    /* Hero is fixed to viewport while inside the travel zone */
+    .svid-sticky {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      z-index: 40; /* below nav (z-index: 50) */
+    }
+    /* Once scrolled past the zone, hero sits statically at its natural position */
+    .svid-sticky.svid-done {
+      position: absolute;
+      top: auto;
+      bottom: 0;
+    }
+
+    /* video fills viewport */
+    #svid {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: center center;
+      z-index: 0;
+    }
+
+    /* dark gradient overlay */
+    .svid-overlay {
+      position: absolute; inset: 0; z-index: 1;
+      background:
+        linear-gradient(to right, rgba(10,14,12,.88) 38%, rgba(10,14,12,.45) 65%, rgba(10,14,12,.15) 100%),
+        linear-gradient(to top, rgba(10,14,12,.98) 0%, transparent 38%),
+        linear-gradient(to bottom, rgba(10,14,12,.55) 0%, transparent 22%);
+    }
+
+    /* scroll progress bar at bottom */
+    .svid-progress {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: rgba(255,255,255,.1);
+      z-index: 20;
+    }
+    .svid-progress__bar {
+      height: 100%;
+      background: var(--green);
+      width: 0%;
+      transition: width .08s linear;
+      box-shadow: 0 0 8px var(--green-glow);
+    }
+
+    /* fallback still image shown before video loads */
+    .svid-poster {
+      position: absolute; inset: 0;
+      z-index: 0;
+      background: url('assets/images/web/robot-field.jpg') center/cover no-repeat;
+    }
+
+    /* ── HERO (alias — shared with sticky inner) ──── */
+    .hero-v2 {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      overflow: hidden;
+      padding-bottom: 0;
+      /* height filled by svid-sticky */
+    }
+
+    /* canvas particles */
+    #hcanvas {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* floating scattered pills — Mobbin-style */
+    .pill {
+      position: absolute;
+      font-family: var(--font-mono);
+      font-size: .62rem; letter-spacing: .18em; text-transform: uppercase;
+      border: 1px solid var(--line-strong);
+      border-radius: 100px;
+      padding: .38rem 1rem;
+      color: var(--muted);
+      z-index: 2;
+      backdrop-filter: blur(4px);
+      background: rgba(10,14,12,.45);
+      animation: pill-float linear infinite;
+      opacity: 0;
+      transition: opacity .4s;
+    }
+    .hero-v2.loaded .pill { opacity: 1; }
+    .pill.grn { border-color: rgba(61,220,111,.35); color: var(--green); }
+    .pill.gld { border-color: rgba(232,181,74,.35); color: var(--gold); }
+    @keyframes pill-float {
+      0%,100% { transform: translateY(0) rotate(var(--r,0deg)); }
+      50% { transform: translateY(var(--dy,-8px)) rotate(var(--r,0deg)); }
+    }
+
+    /* hero text block */
+    .hero-v2__copy {
+      position: relative; z-index: 3;
+      padding: clamp(1.5rem,6vw,4rem) 0 clamp(3rem,8vw,6rem);
+    }
+    .hero-v2__kicker {
+      font-family: var(--font-mono);
+      font-size: .7rem; letter-spacing: .22em; text-transform: uppercase;
+      color: var(--green);
+      display: flex; align-items: center; gap: .7rem;
+      margin-bottom: 1.4rem;
+      opacity: 0; transform: translateY(14px);
+      transition: opacity .8s .1s var(--ease), transform .8s .1s var(--ease);
+    }
+    .hero-v2__kicker::before { content:""; width:24px; height:1px; background:var(--green); }
+    .hero-v2.loaded .hero-v2__kicker { opacity:1; transform:none; }
+
+    .hero-v2__title {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: clamp(5.5rem, 20vw, 16rem);
+      line-height: 0.82;
+      letter-spacing: -0.04em;
+      overflow: hidden;
+    }
+    .hero-v2__title .line { display: block; overflow: hidden; }
+    .hero-v2__title .line > span {
+      display: block;
+      transform: translateY(110%);
+      transition: transform 1.1s var(--ease);
+    }
+    .hero-v2.loaded .hero-v2__title .line:nth-child(1) > span { transform: none; transition-delay: .15s; }
+    .hero-v2.loaded .hero-v2__title .line:nth-child(2) > span { transform: none; transition-delay: .25s; }
+    .hero-v2__title .t-grn { color: var(--green); }
+
+    .hero-v2__sub {
+      font-family: var(--font-display);
+      font-size: clamp(1.1rem,3vw,2rem);
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      margin-top: 1.2rem;
+      opacity: 0; transform: translateY(12px);
+      transition: opacity .8s .5s var(--ease), transform .8s .5s var(--ease);
+    }
+    .hero-v2.loaded .hero-v2__sub { opacity:1; transform:none; }
+
+    .hero-v2__cta {
+      display: flex; gap: .9rem; flex-wrap: wrap;
+      margin-top: 2.2rem;
+      opacity: 0; transform: translateY(12px);
+      transition: opacity .8s .65s var(--ease), transform .8s .65s var(--ease);
+    }
+    .hero-v2.loaded .hero-v2__cta { opacity:1; transform:none; }
+
+    /* grain overlay */
+    .hero-v2::before {
+      content: "";
+      position: absolute; inset: 0; z-index: 2;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: .04;
+    }
+
+    /* glitch flicker on hero title */
+    @keyframes glitch-1 {
+      0%,96%,100% { clip-path: none; transform: none; }
+      97% { clip-path: inset(30% 0 50% 0); transform: translateX(-3px); }
+      98% { clip-path: inset(10% 0 75% 0); transform: translateX(3px); }
+      99% { clip-path: inset(60% 0 15% 0); transform: translateX(-2px); }
+    }
+    .hero-v2__title .line:first-child > span {
+      animation: glitch-1 8s ease-in-out infinite 3s;
+    }
+
+    /* scan lines on hero */
+    .hero-v2__bg::before {
+      content: "";
+      position: absolute; inset: 0; z-index: 1;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px, transparent 3px,
+        rgba(0,0,0,.06) 3px, rgba(0,0,0,.06) 4px
+      );
+      pointer-events: none;
+    }
+
+    /* scroll cue */
+    .scroll-cue {
+      position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+      z-index: 3; display: flex; flex-direction: column; align-items: center; gap: .5rem;
+      font-family: var(--font-mono); font-size: .58rem; letter-spacing: .2em; text-transform: uppercase;
+      color: var(--muted-2);
+      opacity: 0; transition: opacity .8s 1.2s;
+    }
+    .hero-v2.loaded .scroll-cue { opacity:1; }
+    .scroll-cue__line {
+      width: 1px; height: 48px;
+      background: linear-gradient(to bottom, var(--green), transparent);
+      animation: scroll-line 2s ease-in-out infinite;
+    }
+    @keyframes scroll-line {
+      0%,100% { transform: scaleY(1); transform-origin: top; }
+      50% { transform: scaleY(.4); transform-origin: top; }
+    }
+
+    /* ── NUMBERS (Mobbin scatter) ─────────────────── */
+    .scatter {
+      position: relative;
+      min-height: 90vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: var(--bg);
+    }
+    .scatter__center {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+    }
+    .scatter__row {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: clamp(2rem, 6vw, 5rem);
+      flex-wrap: wrap;
+    }
+    .big-stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .2rem;
+    }
+    .big-num {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: clamp(4.5rem, 14vw, 10rem);
+      line-height: 1;
+      letter-spacing: -0.04em;
+      color: var(--text);
+    }
+    .big-num .u { color: var(--green); }
+    .big-label {
+      font-family: var(--font-mono);
+      font-size: .68rem; letter-spacing: .22em; text-transform: uppercase;
+      color: var(--muted);
+    }
+    .stat-divider {
+      width: 1px; height: clamp(60px,10vw,100px);
+      background: var(--line); align-self: center;
+    }
+
+    /* scattered photo thumbnails around numbers */
+    .scatter-img {
+      position: absolute;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--line-strong);
+      box-shadow: 0 20px 60px -20px rgba(0,0,0,.6);
+      animation: scatter-bob ease-in-out infinite;
+    }
+    .scatter-img img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    @keyframes scatter-bob {
+      0%,100% { transform: translateY(0) rotate(var(--rot,0deg)); }
+      50% { transform: translateY(var(--dy,-10px)) rotate(var(--rot,0deg)); }
+    }
+    /* hide on small screens to avoid overlap */
+    @media (max-width: 860px) { .scatter-img { display: none; } }
+
+    /* ── MANIFESTO (finance-style) ────────────────── */
+    .manifesto {
+      background: #0f2d18;
+      position: relative;
+      overflow: hidden;
+      padding: clamp(5rem,12vw,10rem) 0;
+    }
+    .manifesto::before {
+      content: "";
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 60% at 20% 50%, rgba(61,220,111,.18), transparent),
+        radial-gradient(ellipse 40% 60% at 80% 50%, rgba(232,181,74,.06), transparent);
+      pointer-events: none;
+    }
+    .manifesto__inner { position: relative; z-index: 1; }
+    .manifesto__eyebrow {
+      font-family: var(--font-mono);
+      font-size: .68rem; letter-spacing: .25em; text-transform: uppercase;
+      color: rgba(61,220,111,.6);
+      margin-bottom: 1.5rem;
+    }
+    .manifesto__headline {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: clamp(3rem, 9vw, 7.5rem);
+      line-height: 0.9;
+      letter-spacing: -0.035em;
+      color: #fff;
+    }
+    .manifesto__headline em { font-style: normal; color: var(--green); }
+    .manifesto__sub {
+      margin-top: 2.5rem;
+      max-width: 52ch;
+      color: rgba(255,255,255,.55);
+      font-size: 1.05rem;
+      line-height: 1.75;
+    }
+    .manifesto__sub strong { color: rgba(255,255,255,.9); }
+    .manifesto__cta { margin-top: 2.5rem; }
+    /* big background number */
+    .manifesto__bg-num {
+      position: absolute;
+      right: -2rem; top: 50%; transform: translateY(-50%);
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: clamp(12rem, 28vw, 22rem);
+      line-height: 1;
+      color: rgba(61,220,111,.06);
+      letter-spacing: -0.04em;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* ── TEAM PHOTO FULL BLEED ───────────────────── */
+    .team-photo-bleed {
+      position: relative;
+      height: clamp(320px, 55vw, 680px);
+      overflow: hidden;
+    }
+    .team-photo-bleed img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: center 30%;
+      transform: scale(1.04);
+      transition: transform 6s ease;
+    }
+    .team-photo-bleed.in img { transform: scale(1); }
+    .team-photo-bleed__overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to right, rgba(10,14,12,.72) 0%, rgba(10,14,12,.2) 60%, transparent 100%);
+      display: flex; align-items: flex-end;
+      padding: clamp(1.5rem,4vw,4rem);
+    }
+    .team-photo-bleed__overlay p {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: clamp(1.8rem, 5vw, 4rem);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      color: #fff;
+      max-width: 12ch;
+    }
+
+    /* ── ABOUT ────────────────────────────────────── */
+    /* reuse .about from site.css */
+
+    /* ── GOLDFIRE FEATURE ─────────────────────────── */
+    .goldfire {
+      position: relative;
+      overflow: hidden;
+      background: var(--bg);
+    }
+    .goldfire__banner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 80vh;
+    }
+    .goldfire__img {
+      position: relative;
+      overflow: hidden;
+    }
+    .goldfire__img img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      transition: transform .6s var(--ease);
+    }
+    .goldfire__img:hover img { transform: scale(1.03); }
+    .goldfire__img::after {
+      content: "";
+      position: absolute; inset: 0;
+      background:
+        linear-gradient(90deg, transparent 50%, rgba(10,14,12,.9) 100%),
+        linear-gradient(180deg, transparent 50%, rgba(10,14,12,.5));
+    }
+    .goldfire__copy {
+      padding: clamp(2.5rem,5vw,5rem);
+      display: flex; flex-direction: column; justify-content: center;
+      border-left: 1px solid var(--line);
+      background: var(--bg-2);
+    }
+    .goldfire__year {
+      font-family: var(--font-mono);
+      font-size: .68rem; letter-spacing: .24em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 1rem;
+    }
+    .goldfire__name {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: clamp(3rem,6vw,5.5rem);
+      letter-spacing: -0.035em;
+      line-height: .88;
+      margin-bottom: 1.6rem;
+    }
+    .goldfire__desc { color: var(--muted); line-height: 1.8; margin-bottom: 2rem; }
+    .goldfire__desc strong { color: var(--text); }
+    .goldfire__results { display: flex; flex-direction: column; gap: .55rem; }
+    .gr {
+      display: flex; align-items: center; gap: .8rem;
+      padding: .75rem 1.1rem;
+      border: 1px solid var(--line);
+      border-left: 2px solid var(--green);
+      border-radius: 9px;
+      background: var(--surface);
+      transition: transform .2s var(--ease), border-left-color .2s;
+    }
+    .gr:hover { transform: translateX(5px); border-left-color: var(--gold); }
+    .gr-icon { font-size: 1rem; flex-shrink: 0; width: 22px; text-align: center; }
+    .gr-place {
+      font-family: var(--font-mono);
+      font-size: .6rem; color: var(--gold); letter-spacing: .06em; margin-top: .15rem;
+    }
+    @media (max-width:860px) {
+      .goldfire__banner { grid-template-columns: 1fr; }
+      .goldfire__img { min-height: 320px; }
+      .goldfire__copy { border-left: none; border-top: 1px solid var(--line); }
+    }
+
+    /* ── ROBOT FLEET ──────────────────────────────── */
+    .rbot { position: relative; overflow: hidden; }
+    .rbot::after {
+      content: "";
+      position: absolute; inset: 0;
+      border-radius: inherit;
+      box-shadow: inset 0 0 0 1px rgba(61,220,111,0);
+      transition: box-shadow .35s var(--ease);
+      pointer-events: none;
+      z-index: 10;
+    }
+    .rbot:hover::after { box-shadow: inset 0 0 0 1px rgba(61,220,111,.45); }
+    .rbot__watermark {
+      position: absolute;
+      bottom: -1.5rem; right: -0.5rem;
+      font-family: var(--font-display); font-weight: 900;
+      font-size: 6rem; line-height: 1;
+      color: rgba(61,220,111,.05);
+      pointer-events: none; user-select: none;
+      z-index: 0;
+    }
+
+    /* ── PHOTO MARQUEE ────────────────────────────── */
+    .photos .marquee__row img {
+      height: 145px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      object-fit: cover;
+    }
+    @media (max-width:600px){ .photos .marquee__row img { height: 100px; } }
+
+    /* ── COUNTDOWN ────────────────────────────────── */
+    /* reuses .count from site.css */
+
+    /* ── GALLERY MOSAIC ───────────────────────────── */
+    .mosaic {
+      display: grid;
+      grid-template-columns: repeat(12,1fr);
+      grid-template-rows: 220px 180px;
+      gap: .75rem;
+    }
+    .mos {
+      border-radius: var(--radius); overflow: hidden;
+      border: 1px solid var(--line); position: relative;
+    }
+    .mos img { width:100%;height:100%;object-fit:cover; transition: transform .5s var(--ease); }
+    .mos:hover img { transform: scale(1.06); }
+    .mos:nth-child(1) { grid-column:1/6; grid-row:1/3; }
+    .mos:nth-child(2) { grid-column:6/9; }
+    .mos:nth-child(3) { grid-column:9/13; }
+    .mos:nth-child(4) { grid-column:6/9; }
+    .mos:nth-child(5) { grid-column:9/11; }
+    .mos:nth-child(6) { grid-column:11/13; }
+    @media (max-width:860px){
+      .mosaic { grid-template-columns:1fr 1fr; grid-template-rows:auto; }
+      .mos:nth-child(n){ grid-column:auto;grid-row:auto; min-height:160px; }
+    }
+    @media (max-width:480px){ .mosaic { grid-template-columns:1fr; } }
+
+    /* ── AWARDS GRID ──────────────────────────────── */
+    .award { transition: transform .3s var(--ease), border-color .3s; }
+    .award:hover { transform: translateY(-4px); border-color: rgba(232,181,74,.4); }
+
+    /* ── TICKER STRIP ─────────────────────────────── */
+    .ticker-wrap {
+      background: var(--green);
+      overflow: hidden;
+      padding: .65rem 0;
+      position: relative;
+      z-index: 4;
+    }
+    .ticker {
+      display: flex;
+      gap: 3.5rem;
+      width: max-content;
+      animation: ticker-scroll 40s linear infinite;
+    }
+    .ticker span {
+      color: #071208;
+      font-family: var(--font-mono);
+      font-size: .7rem;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .ticker span .sep { opacity: .4; margin: 0 .5rem; }
+    @keyframes ticker-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+    /* ── SEASON TIMELINE ──────────────────────────── */
+    .timeline {
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      margin-top: 2.5rem;
+    }
+    .timeline::-webkit-scrollbar { display: none; }
+    .timeline__item {
+      flex: 1;
+      min-width: 90px;
+      padding: 1.2rem .8rem;
+      border-right: 1px solid var(--line);
+      text-align: center;
+      transition: background .2s;
+    }
+    .timeline__item:last-child { border-right: none; }
+    .timeline__item:hover { background: var(--surface); }
+    .timeline__year {
+      font-family: var(--font-mono);
+      font-size: .58rem;
+      letter-spacing: .14em;
+      color: var(--muted-2);
+      text-transform: uppercase;
+      margin-bottom: .3rem;
+    }
+    .timeline__name {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: .85rem;
+      color: var(--text);
+    }
+    .timeline__item.worlds .timeline__name { color: var(--gold); }
+
+    /* ── WORD SPLIT REVEAL ────────────────────────── */
+    [data-split] .word {
+      display: inline-block;
+      overflow: hidden;
+      vertical-align: bottom;
+    }
+    [data-split] .word > span {
+      display: inline-block;
+      transform: translateY(105%);
+      transition: transform .75s var(--ease);
+    }
+    [data-split].split-in .word > span { transform: none; }
+
+    /* ── OUTREACH CARDS ───────────────────────────── */
+    /* reuse .ocard from site.css */
+
+    /* ── SPONSOR ROW ──────────────────────────────── */
+    .sponsor-row {
+      display: flex; gap: .9rem; flex-wrap: wrap;
+      align-items: center; justify-content: center;
+      margin-top: 2rem;
+    }
+    .spon {
+      border: 1px solid var(--line); border-radius: 10px;
+      padding: .8rem 1.6rem;
+      font-family: var(--font-mono); font-size: .75rem;
+      letter-spacing: .08em; text-transform: uppercase;
+      color: var(--muted);
+      transition: border-color .2s, color .2s;
+    }
+    .spon:hover { border-color: var(--green); color: var(--text); }
+    .spon.feat { border-color: rgba(232,181,74,.4); color: var(--gold); font-size: .82rem; }
+
+    /* ── AUTO PATH ────────────────────────────────── */
+    .auto path.route { fill:none; stroke:var(--green); stroke-width:2.5; stroke-linecap:round;
+      filter: drop-shadow(0 0 6px var(--green-glow)); }
+    .auto .node { fill:var(--gold); }
+    .auto .reading { font-family:var(--font-mono); fill:var(--muted); font-size:9px; letter-spacing:.1em; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════ NAV ══════════ -->
+<header class="nav" id="nav">
+  <div class="wrap nav__in">
+    <a class="brand" href="index.html" aria-label="AwtyBots home">
+      <img src="assets/images/logo.png" alt="AwtyBots Logo">
+      <span><b>AWTY<span>BOTS</span></b><small>FRC 5829</small></span>
+    </a>
+    <nav class="nav__links" id="navlinks" aria-label="Primary">
+      <a href="index.html" aria-current="page">Home</a>
+      <a href="robots.html">Robots</a>
+      <a href="recaps.html">Recaps</a>
+      <a href="events.html">Events</a>
+      <a href="outreach.html">Resources</a>
+      <a class="btn btn--solid nav__cta" href="#join">Join Us</a>
+    </nav>
+    <button class="nav__toggle" id="navtoggle" aria-label="Open menu" aria-expanded="false" aria-controls="navlinks">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+  </div>
+</header>
+
+<main>
+
+<!-- ══════════ SCROLL-VIDEO HERO ══════════ -->
+<div class="svid-wrap" id="svid-wrap">
+  <div class="svid-sticky hero-v2" id="hero">
+
+    <!-- poster fallback (shown instantly, hidden once video loads) -->
+    <div class="svid-poster" id="svid-poster" aria-hidden="true"></div>
+
+    <!-- scroll-scrubbed video: 6s–10s of C1488 -->
+    <video id="svid" muted playsinline preload="auto" webkit-playsinline aria-hidden="true">
+      <source src="assets/video/robot-shoot.mp4" type="video/mp4">
+    </video>
+
+    <!-- colour grading overlay -->
+    <div class="svid-overlay" aria-hidden="true"></div>
+
+    <!-- particle canvas -->
+    <canvas id="hcanvas" aria-hidden="true"></canvas>
+
+    <!-- floating pills -->
+    <div class="pill grn" style="top:14%;left:3%;--r:-2deg;--dy:-12px;animation-duration:4.2s;animation-delay:0s">FRC TEAM 5829</div>
+    <div class="pill" style="top:22%;left:7%;--r:1deg;--dy:-8px;animation-duration:5.5s;animation-delay:.4s">HOUSTON, TX</div>
+    <div class="pill gld" style="top:10%;right:8%;--r:2deg;--dy:-10px;animation-duration:4.8s;animation-delay:.7s">EST. 2016</div>
+    <div class="pill" style="top:28%;right:5%;--r:-1deg;--dy:-14px;animation-duration:6s;animation-delay:.2s">FIRST IN TEXAS</div>
+    <div class="pill grn" style="bottom:28%;right:7%;--r:2.5deg;--dy:-8px;animation-duration:5s;animation-delay:1s">3× WORLDS</div>
+    <div class="pill" style="bottom:38%;left:4%;--r:-2deg;--dy:-12px;animation-duration:4.5s;animation-delay:.6s">40+ STUDENTS</div>
+    <div class="pill gld" style="bottom:22%;left:9%;--r:1deg;--dy:-6px;animation-duration:5.8s;animation-delay:.3s">AWTY INT'L SCHOOL</div>
+
+    <!-- hero copy -->
+    <div class="wrap hero-v2__copy">
+      <p class="hero-v2__kicker">FRC Team 5829 — Awty International School — Houston TX</p>
+      <h1 class="hero-v2__title">
+        <span class="line"><span>AWTY</span></span>
+        <span class="line"><span class="t-grn">BOTS.</span></span>
+      </h1>
+      <p class="hero-v2__sub">Roll out.</p>
+      <div class="hero-v2__cta">
+        <a class="btn btn--solid" href="robots.html">
+          See our robots
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a class="btn btn--ghost" href="https://www.youtube.com/@Awtybots5829" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          Watch on YouTube
+        </a>
+      </div>
+    </div>
+
+    <!-- video scrub progress bar -->
+    <div class="svid-progress" aria-hidden="true">
+      <div class="svid-progress__bar" id="svid-bar"></div>
+    </div>
+
+  </div><!-- /.svid-sticky -->
+</div><!-- /.svid-wrap -->
+
+<!-- ══════════ ACHIEVEMENT TICKER ══════════ -->
+<div class="ticker-wrap" aria-hidden="true">
+  <div class="ticker">
+    <span>🏆 Team Sustainability Award — Dow</span>
+    <span class="sep">·</span>
+    <span>⚡ Industrial Design Award</span>
+    <span class="sep">·</span>
+    <span>🎨 Creativity Award — Rockwell Automation</span>
+    <span class="sep">·</span>
+    <span>🌍 FIRST Championship — Archimedes Division</span>
+    <span class="sep">·</span>
+    <span>🤖 10 Robots Built Since 2016</span>
+    <span class="sep">·</span>
+    <span>📐 3× FIRST Worlds Qualifiers</span>
+    <span class="sep">·</span>
+    <span>🌎 40+ Students · 20+ Countries</span>
+    <span class="sep">·</span>
+    <span>🏆 Team Sustainability Award — Dow</span>
+    <span class="sep">·</span>
+    <span>⚡ Industrial Design Award</span>
+    <span class="sep">·</span>
+    <span>🎨 Creativity Award — Rockwell Automation</span>
+    <span class="sep">·</span>
+    <span>🌍 FIRST Championship — Archimedes Division</span>
+    <span class="sep">·</span>
+    <span>🤖 10 Robots Built Since 2016</span>
+    <span class="sep">·</span>
+    <span>📐 3× FIRST Worlds Qualifiers</span>
+    <span class="sep">·</span>
+    <span>🌎 40+ Students · 20+ Countries</span>
+    <span class="sep">·</span>
+  </div>
+</div>
+
+<!-- ══════════ NUMBERS — MOBBIN SCATTER ══════════ -->
+<section class="scatter" aria-label="Team stats">
+  <!-- scattered photos, Mobbin-style -->
+  <div class="scatter-img reveal" style="width:180px;height:130px;top:8%;left:3%;--rot:-4deg;--dy:-12px;animation-duration:5s">
+    <img src="assets/images/web/makerspace.jpg" alt="">
+  </div>
+  <div class="scatter-img reveal" data-d="1" style="width:150px;height:110px;top:12%;right:4%;--rot:3deg;--dy:-8px;animation-duration:6.5s;animation-delay:.3s">
+    <img src="assets/images/web/season-2.jpg" alt="">
+  </div>
+  <div class="scatter-img reveal" data-d="2" style="width:160px;height:120px;bottom:10%;left:5%;--rot:2deg;--dy:-14px;animation-duration:5.8s;animation-delay:.6s">
+    <img src="assets/images/web/season-4.jpg" alt="">
+  </div>
+  <div class="scatter-img reveal" data-d="1" style="width:140px;height:100px;bottom:14%;right:6%;--rot:-3deg;--dy:-10px;animation-duration:4.8s;animation-delay:.8s">
+    <img src="assets/images/web/feature.jpg" alt="">
+  </div>
+  <div class="scatter-img reveal" data-d="3" style="width:120px;height:90px;top:44%;left:2%;--rot:4deg;--dy:-6px;animation-duration:7s;animation-delay:.4s">
+    <img src="assets/images/web/season-6.jpg" alt="">
+  </div>
+  <div class="scatter-img reveal" data-d="2" style="width:130px;height:95px;top:40%;right:2%;--rot:-2deg;--dy:-11px;animation-duration:5.5s;animation-delay:.9s">
+    <img src="assets/images/web/robot-topspin.jpg" alt="">
+  </div>
+
+  <div class="scatter__center reveal">
+    <div class="scatter__row">
+      <div class="big-stat">
+        <div class="big-num"><span data-count="10">0</span></div>
+        <div class="big-label">Seasons</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="big-stat">
+        <div class="big-num"><span data-count="40">0</span><span class="u">+</span></div>
+        <div class="big-label">Students</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="big-stat">
+        <div class="big-num"><span data-count="3">0</span><span class="u">×</span></div>
+        <div class="big-label">Worlds</div>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="big-stat">
+        <div class="big-num"><span data-count="10">0</span></div>
+        <div class="big-label">Robots Built</div>
+      </div>
+    </div>
+    <p class="mono" style="margin-top:2rem;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted-2)">2016 – 2026 · FIT District · Houston, Texas</p>
+  </div>
+</section>
+
+<!-- ══════════ MANIFESTO — FINANCE STYLE ══════════ -->
+<section class="manifesto">
+  <div class="manifesto__bg-num" aria-hidden="true">5829</div>
+  <div class="wrap manifesto__inner">
+    <p class="manifesto__eyebrow">AwtyBots · Est. 2016</p>
+    <h2 class="manifesto__headline reveal">
+      We don't just<br><em>build robots.</em>
+    </h2>
+    <p class="manifesto__sub">
+      Ten years in, the Awtybots are still at it — <strong>40 students from over 20 countries</strong>, designing, machining, wiring, and programming a new 120-pound machine every season. We've reached the FIRST Championship three times. We bring robotics to students around the world through Project Translate. And we don't stop when the season ends.
+    </p>
+    <div class="manifesto__cta">
+      <a class="btn btn--solid" href="#about" style="background:#fff;color:#0a0e0c">
+        Our story
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ TEAM PHOTO FULL BLEED ══════════ -->
+<div class="team-photo-bleed reveal" aria-hidden="false">
+  <img src="assets/images/web/team.jpg" alt="The full AwtyBots team at competition">
+  <div class="team-photo-bleed__overlay">
+    <p>"Built different.<br>Literally."</p>
+  </div>
+</div>
+
+<!-- ══════════ ABOUT ══════════ -->
+<section class="section section--alt" id="about">
+  <div class="wrap">
+    <div class="about">
+      <div class="about__media reveal">
+        <img src="assets/images/web/makerspace.jpg" alt="AwtyBots in the makerspace">
+        <span class="badge">10 Year Anniversary</span>
+      </div>
+      <div class="about__copy reveal" data-d="1">
+        <p class="eyebrow" style="margin-bottom:1rem">From the Rams</p>
+        <h2 class="reveal">A decade<br>of building.</h2>
+        <p>Team 5829 started in 2015, when Awty's VEX team and a group of mentors decided to go bigger. We rookied in FRC the next season and haven't stopped since. <strong>2026 marks our 10th year</strong> — a decade of robots, road trips across Texas, and students learning to build things that hold up under pressure.</p>
+        <p>Today we're around <strong>40 students across grades 9–12</strong>, competing in the FIRST in Texas district. We've reached the FIRST Championship three times, most recently in the 2026 Archimedes Division — held right here in Houston.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- photo strip -->
+  <div class="wrap photos" style="margin-top:2.4rem">
+    <div class="marquee reveal">
+      <div class="marquee__row">
+        <img src="assets/images/web/makerspace.jpg" alt="Makerspace">
+        <img src="assets/images/web/season-1.jpg" alt="2026 build season">
+        <img src="assets/images/web/season-2.jpg" alt="2026 build season">
+        <img src="assets/images/web/robot-topspin.jpg" alt="Topspin 2022">
+        <img src="assets/images/web/season-3.jpg" alt="Build season">
+        <img src="assets/images/web/season-4.jpg" alt="Build season">
+        <img src="assets/images/web/feature.jpg" alt="Competition day">
+        <img src="assets/images/web/season-5.jpg" alt="Build season">
+        <img src="assets/images/web/season-6.jpg" alt="Build season">
+        <img src="assets/images/web/makerspace.jpg" alt="" aria-hidden="true">
+        <img src="assets/images/web/season-1.jpg" alt="" aria-hidden="true">
+        <img src="assets/images/web/season-2.jpg" alt="" aria-hidden="true">
+        <img src="assets/images/web/robot-topspin.jpg" alt="" aria-hidden="true">
+        <img src="assets/images/web/season-3.jpg" alt="" aria-hidden="true">
+        <img src="assets/images/web/season-4.jpg" alt="" aria-hidden="true">
+        <img src="assets/images/web/feature.jpg" alt="" aria-hidden="true">
+        <img src="assets/images/web/season-5.jpg" alt="" aria-hidden="true">
+        <img src="assets/images/web/season-6.jpg" alt="" aria-hidden="true">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ GOLDFIRE 2026 ══════════ -->
+<section class="goldfire" id="goldfire">
+  <div class="goldfire__banner">
+    <div class="goldfire__img">
+      <img src="assets/images/DSC01029.JPG" alt="Goldfire — AwtyBots 2026 robot">
+    </div>
+    <div class="goldfire__copy">
+      <p class="goldfire__year">2026 · REEFSCAPE℠ · Robot #5829</p>
+      <h2 class="goldfire__name reveal">GOLD<br>FIRE</h2>
+      <p class="goldfire__desc reveal" data-d="1">
+        Our most successful season yet. Goldfire earned an <strong>Event Finalist</strong> finish, a <strong>3rd place</strong> at Space City, and qualified for the <strong>FIRST Championship Archimedes Division</strong> — right here in Houston, TX.
+      </p>
+      <div class="goldfire__results reveal" data-d="2">
+        <div class="gr">
+          <span class="gr-icon">🏆</span>
+          <div><div>FIT McAllen · McAllen Convention Center</div><div class="gr-place">RANK 3 · 9-3-0 · EVENT FINALIST</div></div>
+        </div>
+        <div class="gr">
+          <span class="gr-icon">🥉</span>
+          <div><div>FIT Space City @ Friendswood #2</div><div class="gr-place">RANK 4 · 9-3-0 · 3RD PLACE</div></div>
+        </div>
+        <div class="gr">
+          <span class="gr-icon">⚡</span>
+          <div><div>FIT State Championships · NRG Arena</div><div class="gr-place">MERCURY DIV · RANK 19 · QF</div></div>
+        </div>
+        <div class="gr">
+          <span class="gr-icon">🌍</span>
+          <div><div>FIRST Championship · Archimedes Division</div><div class="gr-place">GRB CONVENTION CENTER · HOUSTON, TX</div></div>
+        </div>
+      </div>
+      <div style="margin-top:1.5rem" class="reveal" data-d="3">
+        <a class="btn btn--ghost" href="https://www.youtube.com/watch?v=BUQ0NH6PVAM" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          Watch robot reveal
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Awards strip -->
+  <div class="wrap" style="padding:3rem 0">
+    <p class="eyebrow reveal" style="margin-bottom:1.4rem">2026 Awards</p>
+    <div class="awards">
+      <div class="award reveal"><h4>Team Sustainability Award</h4><div class="meta">Presented by Dow · FIT McAllen · Rank 3 (9–3)</div></div>
+      <div class="award reveal" data-d="1"><h4>Industrial Design Award</h4><div class="meta">FIT Space City @ Friendswood · 3rd place finish</div></div>
+      <div class="award reveal" data-d="2"><h4>Creativity Award</h4><div class="meta">Sponsored by Rockwell Automation · District Championships</div></div>
+      <div class="award reveal" data-d="3"><h4>FIRST Championship</h4><div class="meta">Archimedes Division · George R. Brown Convention Center</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ ROBOT FLEET ══════════ -->
+<section class="section section--alt" id="robots">
+  <div class="wrap">
+    <div class="section__head">
+      <div>
+        <p class="eyebrow" style="margin-bottom:1rem">The Fleet</p>
+        <h2 class="reveal">Every robot<br>has a name.</h2>
+      </div>
+      <p>Ten robots, ten seasons. Click any card or <a href="robots.html" style="color:var(--green)">see the full history →</a></p>
+    </div>
+
+    <div class="robots">
+      <article class="rbot has-img reveal" data-tilt>
+        <img class="rbot__img" src="assets/images/DSC01029.JPG" alt="Goldfire 2026">
+        <div class="rbot__watermark" aria-hidden="true">26</div>
+        <span class="rbot__year">2026</span><span class="rbot__game">Reefscape</span>
+        <h3 class="rbot__name">Goldfire</h3>
+        <p class="rbot__events">McAllen · Space City · State · Worlds</p>
+      </article>
+
+      <article class="rbot has-img reveal" data-d="1" data-tilt>
+        <img class="rbot__img" src="assets/images/Screenshot 2026-02-10 at 12.07.08 PM.png" alt="Waverider 2025">
+        <div class="rbot__watermark" aria-hidden="true">25</div>
+        <span class="rbot__year">2025</span><span class="rbot__game">Reefscape</span>
+        <h3 class="rbot__name">Waverider</h3>
+        <p class="rbot__events">Belton · Victoria · State</p>
+      </article>
+
+      <article class="rbot has-img reveal" data-d="2" data-tilt>
+        <img class="rbot__img" src="assets/images/Screenshot 2026-02-10 at 12.46.20 PM.png" alt="Jazz 2024">
+        <div class="rbot__watermark" aria-hidden="true">24</div>
+        <span class="rbot__year">2024</span><span class="rbot__game">Crescendo</span>
+        <h3 class="rbot__name">Jazz</h3>
+        <p class="rbot__events">Katy · San Antonio · State</p>
+      </article>
+
+      <article class="rbot has-img reveal" data-tilt>
+        <img class="rbot__img" src="assets/images/Screenshot 2026-02-10 at 1.07.08 PM.png" alt="Greenlight 2023">
+        <div class="rbot__watermark" aria-hidden="true">23</div>
+        <span class="rbot__year">2023</span><span class="rbot__game">Charged Up</span>
+        <h3 class="rbot__name">Greenlight</h3>
+        <p class="rbot__events">Channelview · San Antonio · State</p>
+      </article>
+
+      <article class="rbot has-img reveal" data-d="1" data-tilt>
+        <img class="rbot__img" src="assets/images/Topspin (Better) - 2022.JPEG" alt="Topspin 2022">
+        <div class="rbot__watermark" aria-hidden="true">22</div>
+        <span class="rbot__year">2022</span><span class="rbot__game">Rapid React</span>
+        <h3 class="rbot__name">Topspin</h3>
+        <p class="rbot__events">Channelview · Pasadena · State</p>
+      </article>
+
+      <a class="rbot rbot--more reveal" data-d="2" href="robots.html">
+        <span class="big">2016 →</span>
+        <span class="mono" style="font-size:.74rem;letter-spacing:.1em;color:var(--muted)">SEE ALL 10 ROBOTS</span>
+      </a>
+    </div>
+
+    <!-- Season timeline strip -->
+    <div class="timeline reveal" aria-label="Robot history">
+      <div class="timeline__item worlds"><div class="timeline__year">2026</div><div class="timeline__name">Goldfire</div></div>
+      <div class="timeline__item"><div class="timeline__year">2025</div><div class="timeline__name">Waverider</div></div>
+      <div class="timeline__item"><div class="timeline__year">2024</div><div class="timeline__name">Jazz</div></div>
+      <div class="timeline__item"><div class="timeline__year">2023</div><div class="timeline__name">Greenlight</div></div>
+      <div class="timeline__item"><div class="timeline__year">2022</div><div class="timeline__name">Topspin</div></div>
+      <div class="timeline__item"><div class="timeline__year">2021</div><div class="timeline__name">Ironhide</div></div>
+      <div class="timeline__item"><div class="timeline__year">2019</div><div class="timeline__name">Sideswipe</div></div>
+      <div class="timeline__item worlds"><div class="timeline__year">2018</div><div class="timeline__name">Blurr</div></div>
+      <div class="timeline__item worlds"><div class="timeline__year">2017</div><div class="timeline__name">Bumblebee</div></div>
+      <div class="timeline__item"><div class="timeline__year">2016</div><div class="timeline__name">Crosshairs</div></div>
+    </div>
+    <p style="font-family:var(--font-mono);font-size:.6rem;letter-spacing:.15em;color:var(--muted-2);margin-top:.8rem;text-align:right">
+      Gold = FIRST Championship qualifier
+    </p>
+  </div>
+</section>
+
+<!-- ══════════ GALLERY ══════════ -->
+<section class="section" id="gallery">
+  <div class="wrap">
+    <div class="section__head">
+      <div>
+        <p class="eyebrow" style="margin-bottom:1rem">Gallery</p>
+        <h2 class="reveal">Behind<br>the build.</h2>
+      </div>
+      <p>From the makerspace to the championship field.</p>
+    </div>
+    <div class="mosaic reveal">
+      <div class="mos"><img src="assets/images/web/feature.jpg" alt="Competition"></div>
+      <div class="mos"><img src="assets/images/web/makerspace.jpg" alt="Makerspace"></div>
+      <div class="mos"><img src="assets/images/web/robot-field.jpg" alt="Robot on field"></div>
+      <div class="mos"><img src="assets/images/web/season-1.jpg" alt="Build season"></div>
+      <div class="mos"><img src="assets/images/web/season-3.jpg" alt="Build season"></div>
+      <div class="mos"><img src="assets/images/web/season-5.jpg" alt="Build season"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ AUTONOMOUS PATH ══════════ -->
+<section class="section section--alt">
+  <div class="wrap">
+    <div class="auto reveal">
+      <div class="auto__copy">
+        <p class="eyebrow">Signature // Software</p>
+        <h3 class="reveal">Robots that<br>drive themselves.</h3>
+        <p>Our autonomous routines run on WPILib and PathPlanner, with AdvantageKit logging every match — so we can see exactly what the robot did before a driver ever touches the controller.</p>
+      </div>
+      <div class="auto__field" id="autofield">
+        <svg viewBox="0 0 400 240" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <g stroke="var(--line)" stroke-width="1">
+            <line x1="0" y1="60" x2="400" y2="60"/><line x1="0" y1="120" x2="400" y2="120"/><line x1="0" y1="180" x2="400" y2="180"/>
+            <line x1="100" y1="0" x2="100" y2="240"/><line x1="200" y1="0" x2="200" y2="240"/><line x1="300" y1="0" x2="300" y2="240"/>
+          </g>
+          <path class="route" id="route" d="M40 200 C 90 200, 110 120, 160 120 S 250 60, 300 70 S 360 140, 360 40"/>
+          <circle class="node" cx="40" cy="200" r="4"/>
+          <circle class="node" cx="160" cy="120" r="4"/>
+          <circle class="node" cx="300" cy="70" r="4"/>
+          <circle class="node" cx="360" cy="40" r="4"/>
+          <text class="reading" x="46" y="194">START</text>
+          <text class="reading" x="306" y="64">SCORE</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ COUNTDOWN ══════════ -->
+<section class="section">
+  <div class="wrap">
+    <div class="count reveal">
+      <div>
+        <p class="eyebrow" style="margin-bottom:.4rem">Next Up</p>
+        <h3>FRC 2027 Season Kickoff</h3>
+        <p id="count-sub" style="color:var(--muted);font-family:var(--font-mono);font-size:.78rem;letter-spacing:.04em">January 3, 2027 · George R. Brown Convention Center · Houston, TX</p>
+      </div>
+      <div class="count__clock" id="clock" aria-live="polite">
+        <div><b id="cd-d">--</b><span>Days</span></div>
+        <div><b id="cd-h">--</b><span>Hrs</span></div>
+        <div><b id="cd-m">--</b><span>Min</span></div>
+        <div><b id="cd-s">--</b><span>Sec</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ OUTREACH ══════════ -->
+<section class="section section--alt" id="outreach">
+  <div class="wrap">
+    <div class="section__head">
+      <div>
+        <p class="eyebrow" style="margin-bottom:1rem">Beyond the Robot</p>
+        <h2 class="reveal">Making robotics<br>reachable.</h2>
+      </div>
+      <p>Outreach isn't a side project for us — it's part of how we compete and who we are.</p>
+    </div>
+    <div class="cards2">
+      <article class="ocard reveal">
+        <span class="tag">Outreach // Access</span>
+        <h4>Project Translate</h4>
+        <p>We translate FRC's technical documentation into other languages, so any student — anywhere — can get into robotics no matter what they speak.</p>
+        <a class="more" href="translate.html">View Project Translate
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </article>
+      <article class="ocard reveal" data-d="1">
+        <span class="tag">Outreach // Lab</span>
+        <h4>Belt Organizers</h4>
+        <p>A simple, build-it-yourself system for keeping timing belts sorted in the lab — with instructions any other team can copy and use.</p>
+        <a class="more" href="belts.html">View the build
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ GLOBAL FLAGS ══════════ -->
+<section class="section">
+  <div class="wrap global">
+    <p class="eyebrow" style="justify-content:center;margin-bottom:1rem">One Team, Many Flags</p>
+    <h2>Robotics, in every language.</h2>
+    <p>The Awty International School brings together students from across the world — and our team carries that with us, on the field and in the pit.</p>
+  </div>
+  <div class="marquee reveal" style="margin-top:.5rem" id="flags"></div>
+</section>
+
+<!-- ══════════ SPONSORS ══════════ -->
+<section class="section section--alt" id="sponsors">
+  <div class="wrap">
+    <div class="section__head">
+      <div>
+        <p class="eyebrow" style="margin-bottom:1rem">Partners</p>
+        <h2 class="reveal">Our sponsors<br>make it possible.</h2>
+      </div>
+      <p>Interested in powering the next generation of engineers? <a href="mailto:awtyrobotics@gmail.com" style="color:var(--green)">Reach out →</a></p>
+    </div>
+    <div class="sponsor-row">
+      <div class="spon feat">Awty International School</div>
+      <div class="spon">Your Company Here</div>
+      <div class="spon">Your Company Here</div>
+      <div class="spon">Your Company Here</div>
+      <div class="spon">Your Company Here</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ JOIN ══════════ -->
+<section class="section" id="join">
+  <div class="wrap">
+    <div class="join reveal">
+      <p class="eyebrow" style="justify-content:center;margin-bottom:1rem">Get Involved</p>
+      <h2>Build with us.</h2>
+      <p>Whether you're an Awty student ready to join, a sponsor who wants to power the next robot, or a team looking to collaborate — we'd love to hear from you.</p>
+      <div class="join__cta">
+        <a class="btn btn--solid" href="mailto:awtyrobotics@gmail.com">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="m4 6 8 6 8-6"/></svg>
+          Email the team
+        </a>
+        <a class="btn btn--ghost" href="https://www.thebluealliance.com/team/5829" target="_blank" rel="noopener">View on Blue Alliance</a>
+      </div>
+      <div class="socials">
+        <a href="https://www.youtube.com/@Awtybots5829" target="_blank" rel="noopener" aria-label="YouTube"><img src="assets/images/youtube.png" alt=""></a>
+        <a href="https://www.instagram.com/awtybots5829/" target="_blank" rel="noopener" aria-label="Instagram"><img src="assets/images/instagram.png" alt=""></a>
+        <a href="https://github.com/awtybots" target="_blank" rel="noopener" aria-label="GitHub"><img src="assets/images/github.png" alt=""></a>
+        <a href="https://www.facebook.com/AwtyBots5829/" target="_blank" rel="noopener" aria-label="Facebook"><img src="assets/images/facebook.png" alt=""></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ══════════ FOOTER ══════════ -->
+<footer class="foot">
+  <div class="wrap foot__in">
+    <p>AwtyBots · FRC Team 5829 © 2015–2026<br>awtyrobotics@gmail.com · Houston, TX</p>
+    <p>
+      Live data: <a href="https://www.thebluealliance.com/team/5829" target="_blank" rel="noopener">The Blue Alliance</a> ·
+      <a href="https://frc-events.firstinspires.org/team/5829" target="_blank" rel="noopener">FIRST</a><br>
+      Site maintained by the AwtyBots · <a href="#hero">Back to top ↑</a>
+    </p>
+  </div>
+</footer>
+
+<script src="assets/js/site.js"></script>
+<script>
+(function() {
+  "use strict";
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const ease = "cubic-bezier(.22,.61,.36,1)";
+
+  /* ── Hero reveal ── */
+  const hero = document.querySelector('.hero-v2');
+  function loadHero() { hero && hero.classList.add('loaded'); }
+  window.addEventListener('load', () => requestAnimationFrame(loadHero));
+  if (document.readyState === 'complete') loadHero();
+
+  /* ── Scroll-scrub video ── */
+  const svid    = document.getElementById('svid');
+  const svidWrap= document.getElementById('svid-wrap');
+  const svidHero= document.getElementById('hero');
+  const svidBar = document.getElementById('svid-bar');
+  const svidPoster = document.getElementById('svid-poster');
+
+  if (svid && svidWrap && svidHero) {
+    // Give the wrap a relative context so absolute fallback works
+    svidWrap.style.position = 'relative';
+
+    // Hide poster once first frame is decoded
+    const hidePoster = () => {
+      if (!svidPoster) return;
+      svidPoster.style.transition = 'opacity .5s';
+      svidPoster.style.opacity = '0';
+      setTimeout(() => { svidPoster.style.display = 'none'; }, 550);
+    };
+    svid.addEventListener('canplay', hidePoster, { once: true });
+    // Also try to get a frame by triggering load
+    svid.load();
+
+    let ticking = false;
+    const update = () => {
+      const wrapRect   = svidWrap.getBoundingClientRect();
+      const scrollable = svidWrap.offsetHeight - window.innerHeight;
+
+      if (wrapRect.bottom <= window.innerHeight) {
+        // Scrolled PAST the zone — unpin hero
+        svidHero.style.position = 'absolute';
+        svidHero.style.top      = 'auto';
+        svidHero.style.bottom   = '0';
+        svidHero.style.left     = '0';
+        svidHero.style.right    = '0';
+        if (svidBar) svidBar.style.width = '100%';
+      } else {
+        // Inside or above zone — keep hero fixed (covers full viewport)
+        svidHero.style.position = 'fixed';
+        svidHero.style.top      = '0';
+        svidHero.style.left     = '0';
+        svidHero.style.right    = '0';
+        svidHero.style.bottom   = 'auto';
+
+        const progress = Math.max(0, Math.min(1, -wrapRect.top / scrollable));
+        if (svid.duration) {
+          const target = progress * svid.duration;
+          if (Math.abs(svid.currentTime - target) > 0.04) svid.currentTime = target;
+        }
+        if (svidBar) svidBar.style.width = (progress * 100) + '%';
+      }
+      ticking = false;
+    };
+
+    window.addEventListener('scroll', () => {
+      if (!ticking) { requestAnimationFrame(update); ticking = true; }
+    }, { passive: true });
+
+    // Run once on load to set initial state
+    update();
+  }
+
+  /* ── Particle canvas ── */
+  if (!reduce) {
+    const canvas = document.getElementById('hcanvas');
+    const ctx = canvas ? canvas.getContext('2d') : null;
+    if (ctx) {
+      let W, H, pts = [];
+      function resize() {
+        W = canvas.width = canvas.offsetWidth;
+        H = canvas.height = canvas.offsetHeight;
+      }
+      resize();
+      new ResizeObserver(resize).observe(canvas.parentElement);
+      for (let i = 0; i < 50; i++) {
+        pts.push({ x: Math.random()*1600, y: Math.random()*900,
+          vx: (Math.random()-.5)*.22, vy: (Math.random()-.5)*.22, r: Math.random()*1.5+.4 });
+      }
+      function draw() {
+        ctx.clearRect(0, 0, W, H);
+        for (let i = 0; i < pts.length; i++) {
+          const p = pts[i];
+          p.x += p.vx; p.y += p.vy;
+          if (p.x<0) p.x=W; if (p.x>W) p.x=0;
+          if (p.y<0) p.y=H; if (p.y>H) p.y=0;
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+          ctx.fillStyle = 'rgba(61,220,111,.5)'; ctx.fill();
+          for (let j = i+1; j < pts.length; j++) {
+            const q = pts[j], dx = p.x-q.x, dy = p.y-q.y, d = Math.sqrt(dx*dx+dy*dy);
+            if (d < 140) {
+              ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y);
+              ctx.strokeStyle = `rgba(61,220,111,${.06*(1-d/140)})`; ctx.lineWidth=.7; ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(draw);
+      }
+      draw();
+    }
+  }
+
+  /* ── Word split ── */
+  function splitWords(el) {
+    const html = el.innerHTML;
+    el.innerHTML = html.replace(/(\S+)/g, '<span class="word"><span>$1</span></span>');
+    // add stagger delays
+    el.querySelectorAll('.word > span').forEach((s, i) => {
+      s.style.transitionDelay = (i * 0.07) + 's';
+    });
+  }
+  document.querySelectorAll('[data-split]').forEach(splitWords);
+
+  /* ── Scroll observer: .reveal + [data-split] ── */
+  const all = document.querySelectorAll('.reveal, [data-split]');
+  if ('IntersectionObserver' in window && !reduce) {
+    const io = new IntersectionObserver((entries, obs) => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        const el = e.target;
+        if (el.classList.contains('reveal')) {
+          const d = el.dataset.d || 0;
+          setTimeout(() => el.classList.add('in'), d * 80);
+        }
+        if (el.dataset.split !== undefined) {
+          el.classList.add('split-in');
+        }
+        obs.unobserve(el);
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+    all.forEach(el => io.observe(el));
+  } else {
+    all.forEach(el => { el.classList.add('in', 'split-in'); });
+  }
+
+  /* ── Count-up (reuses data-count from site.js but override with big-num spans) ── */
+  document.querySelectorAll('[data-count]').forEach(el => {
+    if (reduce) { el.textContent = el.dataset.count; return; }
+    const io2 = new IntersectionObserver((entries, obs) => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        const target = parseInt(e.target.dataset.count, 10);
+        const dur = 1600, start = performance.now();
+        const step = now => {
+          const t = Math.min(1, (now-start)/dur);
+          const eased = 1-Math.pow(1-t,3);
+          e.target.textContent = Math.round(eased*target);
+          if (t < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+        obs.unobserve(e.target);
+      });
+    }, { threshold: 0.6 });
+    io2.observe(el);
+  });
+
+  /* ── Countdown to FRC 2027 Kickoff ── */
+  const clock = document.getElementById('clock');
+  if (clock) {
+    const target = new Date('2027-01-03T10:00:00-06:00').getTime();
+    const d = document.getElementById('cd-d'), h = document.getElementById('cd-h'),
+          m = document.getElementById('cd-m'), s = document.getElementById('cd-s');
+    const pad = n => String(n).padStart(2,'0');
+    const tick = () => {
+      const diff = target - Date.now();
+      if (diff <= 0) {
+        clock.innerHTML = '<div style="min-width:auto;padding:.7rem 1.2rem"><b style="font-size:1.4rem">KICKOFF</b><span>Season is live!</span></div>';
+        return false;
+      }
+      d.textContent = Math.floor(diff/864e5);
+      h.textContent = pad(Math.floor((diff%864e5)/36e5));
+      m.textContent = pad(Math.floor((diff%36e5)/6e4));
+      s.textContent = pad(Math.floor((diff%6e4)/1e3));
+      return true;
+    };
+    if (tick() !== false) { const iv = setInterval(() => { if (!tick()) clearInterval(iv); }, 1000); }
+  }
+
+  /* ── Auto path draw ── */
+  const route = document.getElementById('route');
+  if (route && !reduce) {
+    const len = route.getTotalLength();
+    route.style.strokeDasharray = len;
+    route.style.strokeDashoffset = len;
+    const pio = new IntersectionObserver((entries, obs) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          route.style.transition = 'stroke-dashoffset 2.2s cubic-bezier(.22,.61,.36,1)';
+          requestAnimationFrame(() => { route.style.strokeDashoffset = 0; });
+          obs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.4 });
+    const af = document.getElementById('autofield');
+    if (af) pio.observe(af);
+  }
+
+  /* ── Nav scroll state ── */
+  const nav = document.getElementById('nav');
+  const onScroll = () => nav && nav.classList.toggle('scrolled', window.scrollY > 24);
+  onScroll(); window.addEventListener('scroll', onScroll, { passive: true });
+  const toggle = document.getElementById('navtoggle'), links = document.getElementById('navlinks');
+  if (toggle && links) {
+    toggle.addEventListener('click', () => {
+      const open = links.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', String(open));
+    });
+    links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+      links.classList.remove('open'); toggle.setAttribute('aria-expanded','false');
+    }));
+  }
+
+  /* ── Robot card tilt ── */
+  if (window.matchMedia('(hover:hover)').matches && !reduce) {
+    document.querySelectorAll('[data-tilt]').forEach(card => {
+      card.addEventListener('pointermove', ev => {
+        const r = card.getBoundingClientRect();
+        const px = (ev.clientX-r.left)/r.width-.5, py = (ev.clientY-r.top)/r.height-.5;
+        card.style.transform = `translateY(-6px) perspective(800px) rotateX(${(-py*6).toFixed(2)}deg) rotateY(${(px*6).toFixed(2)}deg)`;
+      });
+      card.addEventListener('pointerleave', () => { card.style.transform=''; });
+    });
+  }
+
+  /* ── Flag marquee ── */
+  const flags = document.getElementById('flags');
+  if (flags) {
+    const list = ['usa.jpg','india.avif','poland.png','uk.jpg','syria.webp','thailand.jpg','canada.avif',
+      'armenia.png','china.png','venezuela.avif','spain.avif','nether.png','malaysia.jpg',
+      'pakistan.png','russia.png','singapore.avif','australia.png','andorra.png','southkorea.avif',
+      'austria.png','germany.avif','colombia.png','panama.webp','argentina.png','phillipines.png',
+      'vietnam.webp','switzerland.avif','italy.avif','iran.jpg','pride.png'];
+    const row = document.createElement('div'); row.className='marquee__row';
+    const make = (hidden) => list.forEach(f => {
+      const img = document.createElement('img');
+      img.src = 'assets/images/flags/'+f; img.loading='lazy';
+      img.alt = hidden ? '' : f.split('.')[0];
+      if (hidden) img.setAttribute('aria-hidden','true');
+      row.appendChild(img);
+    });
+    make(false); make(true);
+    flags.appendChild(row);
+  }
+})();
+</script>
+</body>
+</html>
