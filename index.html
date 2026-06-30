@@ -36,14 +36,13 @@
       bottom: 0;
     }
 
-    /* video fills viewport */
-    #svid {
+    /* canvas fills viewport */
+    #svid-canvas {
       position: absolute;
       inset: 0;
       width: 100%; height: 100%;
-      object-fit: cover;
-      object-position: center center;
       z-index: 0;
+      background: #000;
     }
 
     /* dark gradient overlay */
@@ -646,13 +645,8 @@
 <div class="svid-wrap" id="svid-wrap">
   <div class="svid-sticky hero-v2" id="hero">
 
-    <!-- poster fallback (shown instantly, hidden once video loads) -->
-    <div class="svid-poster" id="svid-poster" aria-hidden="true"></div>
-
-    <!-- scroll-scrubbed video: 6s–10s of C1488 -->
-    <video id="svid" muted playsinline preload="auto" webkit-playsinline aria-hidden="true">
-      <source src="assets/video/robot-shoot.mp4" type="video/mp4">
-    </video>
+    <!-- canvas frame scrubber (replaces video element) -->
+    <canvas id="svid-canvas" aria-hidden="true"></canvas>
 
     <!-- colour grading overlay -->
     <div class="svid-overlay" aria-hidden="true"></div>
@@ -1157,66 +1151,89 @@
   window.addEventListener('load', () => requestAnimationFrame(loadHero));
   if (document.readyState === 'complete') loadHero();
 
-  /* ── Scroll-scrub video ── */
-  const svid    = document.getElementById('svid');
-  const svidWrap= document.getElementById('svid-wrap');
-  const svidHero= document.getElementById('hero');
-  const svidBar = document.getElementById('svid-bar');
-  const svidPoster = document.getElementById('svid-poster');
+  /* ── Canvas frame scrubber ── */
+  (function () {
+    const canvas  = document.getElementById('svid-canvas');
+    const wrap    = document.getElementById('svid-wrap');
+    const hero    = document.getElementById('hero');
+    const bar     = document.getElementById('svid-bar');
+    if (!canvas || !wrap || !hero) return;
 
-  if (svid && svidWrap && svidHero) {
-    // Give the wrap a relative context so absolute fallback works
-    svidWrap.style.position = 'relative';
+    const ctx         = canvas.getContext('2d');
+    const TOTAL       = 90;   // number of extracted frames
+    const FRAME_PATH  = 'assets/video/frames/frame';
+    const frames      = new Array(TOTAL);
+    let   loaded      = 0;
+    let   ticking     = false;
+    let   currentIdx  = -1;
 
-    // Hide poster once first frame is decoded
-    const hidePoster = () => {
-      if (!svidPoster) return;
-      svidPoster.style.transition = 'opacity .5s';
-      svidPoster.style.opacity = '0';
-      setTimeout(() => { svidPoster.style.display = 'none'; }, 550);
-    };
-    svid.addEventListener('canplay', hidePoster, { once: true });
-    // Also try to get a frame by triggering load
-    svid.load();
+    // Size canvas to fill viewport
+    function resize() {
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+      draw(currentIdx < 0 ? 0 : currentIdx);
+    }
+    window.addEventListener('resize', resize);
+    resize();
 
-    let ticking = false;
-    const update = () => {
-      const wrapRect   = svidWrap.getBoundingClientRect();
-      const scrollable = svidWrap.offsetHeight - window.innerHeight;
+    // Draw a specific frame
+    function draw(idx) {
+      idx = Math.max(0, Math.min(TOTAL - 1, idx));
+      if (frames[idx] && frames[idx].complete && frames[idx].naturalWidth) {
+        const img = frames[idx];
+        const cw = canvas.width, ch = canvas.height;
+        const iw = img.naturalWidth, ih = img.naturalHeight;
+        const scale = Math.max(cw / iw, ch / ih);
+        const dw = iw * scale, dh = ih * scale;
+        ctx.drawImage(img, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
+        currentIdx = idx;
+      }
+    }
 
-      if (wrapRect.bottom <= window.innerHeight) {
-        // Scrolled PAST the zone — unpin hero
-        svidHero.style.position = 'absolute';
-        svidHero.style.top      = 'auto';
-        svidHero.style.bottom   = '0';
-        svidHero.style.left     = '0';
-        svidHero.style.right    = '0';
-        if (svidBar) svidBar.style.width = '100%';
+    // Scroll handler
+    wrap.style.position = 'relative';
+    function update() {
+      const rect       = wrap.getBoundingClientRect();
+      const scrollable = wrap.offsetHeight - window.innerHeight;
+
+      if (rect.bottom <= window.innerHeight) {
+        hero.style.position = 'absolute';
+        hero.style.top = 'auto'; hero.style.bottom = '0';
+        hero.style.left = '0';  hero.style.right  = '0';
+        if (bar) bar.style.width = '100%';
+        draw(TOTAL - 1);
       } else {
-        // Inside or above zone — keep hero fixed (covers full viewport)
-        svidHero.style.position = 'fixed';
-        svidHero.style.top      = '0';
-        svidHero.style.left     = '0';
-        svidHero.style.right    = '0';
-        svidHero.style.bottom   = 'auto';
-
-        const progress = Math.max(0, Math.min(1, -wrapRect.top / scrollable));
-        if (svid.duration) {
-          const target = progress * svid.duration;
-          if (Math.abs(svid.currentTime - target) > 0.04) svid.currentTime = target;
-        }
-        if (svidBar) svidBar.style.width = (progress * 100) + '%';
+        hero.style.position = 'fixed';
+        hero.style.top = '0'; hero.style.bottom = 'auto';
+        hero.style.left = '0'; hero.style.right = '0';
+        const progress = Math.max(0, Math.min(1, -rect.top / scrollable));
+        const idx = Math.round(progress * (TOTAL - 1));
+        if (bar) bar.style.width = (progress * 100) + '%';
+        draw(idx);
       }
       ticking = false;
-    };
+    }
 
     window.addEventListener('scroll', () => {
       if (!ticking) { requestAnimationFrame(update); ticking = true; }
     }, { passive: true });
-
-    // Run once on load to set initial state
     update();
-  }
+
+    // Preload all frames — draw each one as it arrives
+    function pad(n) { return String(n).padStart(4, '0'); }
+    for (let i = 0; i < TOTAL; i++) {
+      const img = new Image();
+      frames[i] = img;
+      img.onload = () => {
+        loaded++;
+        // Draw frame 0 as soon as it's ready (shows immediately)
+        if (i === 0) draw(0);
+        // Redraw current frame if this is the one we need
+        if (i === currentIdx || currentIdx < 0) draw(i === 0 ? 0 : currentIdx);
+      };
+      img.src = FRAME_PATH + pad(i + 1) + '.jpg';
+    }
+  })();
 
   /* ── Particle canvas ── */
   if (!reduce) {
