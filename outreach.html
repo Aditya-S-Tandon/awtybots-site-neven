@@ -140,23 +140,8 @@
           <line x1="667" y1="0" x2="667" y2="500"/>
           <line x1="833" y1="0" x2="833" y2="500"/>
         </g>
-        <!-- Continent outlines (equirectangular, viewBox 0 0 1000 500) -->
-        <g stroke="rgba(61,220,111,.28)" stroke-width="1.3" stroke-linejoin="round" fill="rgba(61,220,111,.07)">
-          <!-- North America -->
-          <path d="M108,53 L236,53 L322,83 L353,119 L317,128 L292,153 L278,181 L250,181 L231,189 L206,189 L181,169 L175,161 L158,144 L156,114 L136,94Z"/>
-          <!-- Greenland -->
-          <path d="M450,39 L439,56 L394,67 L356,72 L328,61 L322,50 L339,39 L389,22 L403,19 L422,19Z"/>
-          <!-- South America -->
-          <path d="M300,217 L328,222 L356,236 L361,250 L403,264 L397,278 L381,314 L350,344 L325,367 L311,394 L319,403 L328,361 L367,322 L386,311Z"/>
-          <!-- Europe -->
-          <path d="M483,150 L475,144 L475,128 L494,128 L506,111 L511,108 L514,100 L522,92 L514,81 L519,89 L528,97 L533,92 L550,83 L539,72 L539,61 L569,56 L578,53 L578,81 L561,89 L550,100 L542,108 L547,117 L539,125 L544,131 L542,144 L528,147Z"/>
-          <!-- Africa -->
-          <path d="M528,147 L603,147 L617,161 L603,189 L622,217 L614,239 L611,261 L611,283 L592,322 L572,344 L550,344 L539,322 L533,297 L525,256 L508,236 L492,239 L486,236 L486,228 L461,222 L453,211 L453,192 L478,161Z"/>
-          <!-- Asia -->
-          <path d="M639,53 L861,53 L889,67 L889,86 L894,111 L867,131 L836,172 L817,189 L778,217 L775,228 L786,244 L789,247 L806,250 L817,272 L825,236 L844,222 L836,211 L750,183 L744,189 L722,217 L714,228 L706,211 L689,189 L672,167 L644,147 L614,136 L581,136 L575,144 L603,147 L606,119 L639,117 L642,97 L653,61Z"/>
-          <!-- Australia -->
-          <path d="M861,289 L844,289 L817,311 L819,333 L828,347 L883,347 L908,358 L925,333 L917,311 L903,292 L878,283Z"/>
-        </g>
+        <!-- Land paths injected by JS from world-atlas TopoJSON -->
+        <g id="map-land" stroke="rgba(61,220,111,.28)" stroke-width="0.8" stroke-linejoin="round" fill="rgba(61,220,111,.08)"></g>
         <!-- Country dots (revealed by JS) -->
         <g id="country-dots"></g>
       </svg>
@@ -230,70 +215,101 @@
 </footer>
 
 <script src="assets/js/site.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
 <script>
 (function () {
+  const landGroup = document.getElementById('map-land');
   const dotsGroup = document.getElementById('country-dots');
   const counter   = document.getElementById('map-count');
   const svg       = document.getElementById('world-map');
-  if (!dotsGroup || !svg) return;
+  if (!dotsGroup || !svg || !landGroup) return;
 
-  // SVG coordinate space is 1000×500 (equirectangular)
-  // x = (lon+180)/360*1000,  y = (90-lat)/180*500
+  const W = 1000, H = 500;
+
+  // Equirectangular projection
+  function project(lon, lat) {
+    return [(lon + 180) / 360 * W, (90 - lat) / 180 * H];
+  }
+
+  // GeoJSON geometry → SVG path d string
+  function geomToPath(geom) {
+    function ring(coords) {
+      return coords.map((c, i) => {
+        const [x, y] = project(c[0], c[1]);
+        return (i === 0 ? 'M' : 'L') + x.toFixed(1) + ',' + y.toFixed(1);
+      }).join('') + 'Z';
+    }
+    if (geom.type === 'Polygon') return geom.coordinates.map(ring).join('');
+    if (geom.type === 'MultiPolygon') return geom.coordinates.map(p => p.map(ring).join('')).join('');
+    return '';
+  }
+
+  // Fetch real world map data (Natural Earth 110m via world-atlas)
+  fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/land-110m.json')
+    .then(r => r.json())
+    .then(world => {
+      const land = topojson.feature(world, world.objects.land);
+      const d = geomToPath(land.geometry);
+      if (d) {
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', d);
+        landGroup.appendChild(path);
+      }
+    });
+
+  // Country dot positions: [lon, lat, name]
   const countries = [
-    // [svgX, svgY, name]  — x=(lon+180)/360*1000, y=(90-lat)/180*500
-    [231, 144, 'USA'],
-    [714, 194, 'India'],
-    [556, 106, 'Poland'],
-    [492, 100, 'UK'],
-    [606, 153, 'Syria'],
-    [781, 208, 'Thailand'],
-    [233,  94, 'Canada'],
-    [625, 139, 'Armenia'],
-    [789, 153, 'China'],
-    [317, 228, 'Venezuela'],
-    [489, 139, 'Spain'],
-    [514, 106, 'Netherlands'],
-    [803, 239, 'Malaysia'],
-    [692, 167, 'Pakistan'],
-    [750,  83, 'Russia'],
-    [789, 247, 'Singapore'],
-    [869, 319, 'Australia'],
-    [504, 133, 'Andorra'],
-    [856, 147, 'South Korea'],
-    [539, 119, 'Austria'],
-    [528, 108, 'Germany'],
-    [300, 239, 'Colombia'],
-    [278, 225, 'Panama'],
-    [322, 344, 'Argentina'],
-    [842, 217, 'Philippines'],
-    [800, 211, 'Vietnam'],
-    [522, 119, 'Switzerland'],
-    [533, 133, 'Italy'],
-    [647, 161, 'Iran'],
+    [-97, 38,  'USA'],
+    [ 77, 20,  'India'],
+    [ 20, 52,  'Poland'],
+    [ -3, 54,  'UK'],
+    [ 38, 35,  'Syria'],
+    [101, 15,  'Thailand'],
+    [-96, 56,  'Canada'],
+    [ 45, 40,  'Armenia'],
+    [104, 35,  'China'],
+    [-66,  8,  'Venezuela'],
+    [ -4, 40,  'Spain'],
+    [  5, 52,  'Netherlands'],
+    [109,  4,  'Malaysia'],
+    [ 69, 30,  'Pakistan'],
+    [ 90, 60,  'Russia'],
+    [104,  1,  'Singapore'],
+    [133,-25,  'Australia'],
+    [1.5, 42,  'Andorra'],
+    [128, 37,  'South Korea'],
+    [ 14, 47,  'Austria'],
+    [ 10, 51,  'Germany'],
+    [-72,  4,  'Colombia'],
+    [-80,  9,  'Panama'],
+    [-64,-34,  'Argentina'],
+    [123, 12,  'Philippines'],
+    [108, 14,  'Vietnam'],
+    [  8, 47,  'Switzerland'],
+    [ 12, 42,  'Italy'],
+    [ 53, 32,  'Iran'],
   ];
 
   const NS = 'http://www.w3.org/2000/svg';
 
   // Build all dot groups hidden; reveal one by one on scroll
-  countries.forEach(([x, y, name], i) => {
+  countries.forEach(([lon, lat, name], i) => {
+    const [x, y] = project(lon, lat);
     const g = document.createElementNS(NS, 'g');
     g.setAttribute('aria-label', name);
     g.style.opacity = '0';
     g.style.transition = 'opacity .35s';
 
-    // glow halo
     const halo = document.createElementNS(NS, 'circle');
     halo.setAttribute('cx', x); halo.setAttribute('cy', y); halo.setAttribute('r', '10');
     halo.setAttribute('fill', 'rgba(61,220,111,.18)');
 
-    // core dot
     const dot = document.createElementNS(NS, 'circle');
     dot.setAttribute('cx', x); dot.setAttribute('cy', y); dot.setAttribute('r', '3.5');
     dot.setAttribute('fill', '#3ddc6f');
 
-    // ping ring (CSS animated via transform-box trick: wrap in translated g)
     const pg = document.createElementNS(NS, 'g');
-    pg.setAttribute('transform', `translate(${x},${y})`);
+    pg.setAttribute('transform', `translate(${x.toFixed(1)},${y.toFixed(1)})`);
     const ping = document.createElementNS(NS, 'circle');
     ping.setAttribute('cx', '0'); ping.setAttribute('cy', '0'); ping.setAttribute('r', '3.5');
     ping.setAttribute('fill', 'none');
