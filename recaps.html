@@ -23,10 +23,12 @@
       width: 100%; height: 2px;
       background: var(--line);
       margin: 2.8rem 0 0;
-      /* expand clickable area without changing visual height */
-      padding: 10px 0;
-      margin-top: calc(2.8rem - 10px);
-      box-sizing: content-box;
+      cursor: pointer;
+    }
+    /* Invisible hit-area extension — 14px above and below the 2px line */
+    .stl-track::before {
+      content: ''; position: absolute;
+      top: -14px; bottom: -14px; left: 0; right: 0;
     }
 
     /* the animated fill line */
@@ -193,10 +195,10 @@
     <!-- Recap viewer -->
     <div class="recap-shell reveal">
       <div class="recap-toolbar">
-        <button id="back-all">⟪ First</button>
+        <button id="back-all">|← First</button>
         <button id="back">← Prev</button>
         <button id="next">Next →</button>
-        <button id="next-all">Last ⟫</button>
+        <button id="next-all">Last →|</button>
         <div class="day-input-wrap">
           <label for="pages">Day:</label>
           <input type="text" id="pages" placeholder="1">

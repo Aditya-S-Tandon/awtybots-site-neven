@@ -21,6 +21,16 @@
     #world-map {
       display: block; width: 100%;
       height: clamp(200px, 40vw, 400px);
+      overflow: visible;
+    }
+    @keyframes dot-ping {
+      0%   { transform: scale(1); opacity: .6; }
+      100% { transform: scale(4); opacity: 0; }
+    }
+    .dot-pulse {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: dot-ping 2.2s ease-out infinite;
     }
     .map-legend {
       position: absolute; bottom: 1rem; left: 1.2rem;
@@ -116,7 +126,40 @@
 
     <!-- World map -->
     <div class="world-map-wrap reveal">
-      <canvas id="world-map" aria-label="World map showing countries reached by Project Translate"></canvas>
+      <svg id="world-map" viewBox="0 0 1000 500" preserveAspectRatio="xMidYMid meet" aria-label="World map showing countries reached by Project Translate">
+        <!-- Grid lines -->
+        <g stroke="rgba(61,220,111,.05)" stroke-width="0.5" fill="none">
+          <line x1="0" y1="83" x2="1000" y2="83"/>
+          <line x1="0" y1="167" x2="1000" y2="167"/>
+          <line x1="0" y1="250" x2="1000" y2="250"/>
+          <line x1="0" y1="333" x2="1000" y2="333"/>
+          <line x1="0" y1="417" x2="1000" y2="417"/>
+          <line x1="167" y1="0" x2="167" y2="500"/>
+          <line x1="333" y1="0" x2="333" y2="500"/>
+          <line x1="500" y1="0" x2="500" y2="500"/>
+          <line x1="667" y1="0" x2="667" y2="500"/>
+          <line x1="833" y1="0" x2="833" y2="500"/>
+        </g>
+        <!-- Continent outlines (equirectangular, viewBox 0 0 1000 500) -->
+        <g stroke="rgba(61,220,111,.28)" stroke-width="1.3" stroke-linejoin="round" fill="rgba(61,220,111,.07)">
+          <!-- North America -->
+          <path d="M108,53 L236,53 L322,83 L353,119 L317,128 L292,153 L278,181 L250,181 L231,189 L206,189 L181,169 L175,161 L158,144 L156,114 L136,94Z"/>
+          <!-- Greenland -->
+          <path d="M450,39 L439,56 L394,67 L356,72 L328,61 L322,50 L339,39 L389,22 L403,19 L422,19Z"/>
+          <!-- South America -->
+          <path d="M300,217 L328,222 L356,236 L361,250 L403,264 L397,278 L381,314 L350,344 L325,367 L311,394 L319,403 L328,361 L367,322 L386,311Z"/>
+          <!-- Europe -->
+          <path d="M483,150 L475,144 L475,128 L494,128 L506,111 L511,108 L514,100 L522,92 L514,81 L519,89 L528,97 L533,92 L550,83 L539,72 L539,61 L569,56 L578,53 L578,81 L561,89 L550,100 L542,108 L547,117 L539,125 L544,131 L542,144 L528,147Z"/>
+          <!-- Africa -->
+          <path d="M528,147 L603,147 L617,161 L603,189 L622,217 L614,239 L611,261 L611,283 L592,322 L572,344 L550,344 L539,322 L533,297 L525,256 L508,236 L492,239 L486,236 L486,228 L461,222 L453,211 L453,192 L478,161Z"/>
+          <!-- Asia -->
+          <path d="M639,53 L861,53 L889,67 L889,86 L894,111 L867,131 L836,172 L817,189 L778,217 L775,228 L786,244 L789,247 L806,250 L817,272 L825,236 L844,222 L836,211 L750,183 L744,189 L722,217 L714,228 L706,211 L689,189 L672,167 L644,147 L614,136 L581,136 L575,144 L603,147 L606,119 L639,117 L642,97 L653,61Z"/>
+          <!-- Australia -->
+          <path d="M861,289 L844,289 L817,311 L819,333 L828,347 L883,347 L908,358 L925,333 L917,311 L903,292 L878,283Z"/>
+        </g>
+        <!-- Country dots (revealed by JS) -->
+        <g id="country-dots"></g>
+      </svg>
       <div class="map-legend">Project Translate reach</div>
       <div class="map-counter">
         <span id="map-count">0</span>
@@ -189,216 +232,94 @@
 <script src="assets/js/site.js"></script>
 <script>
 (function () {
-  const canvas = document.getElementById('world-map');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
+  const dotsGroup = document.getElementById('country-dots');
+  const counter   = document.getElementById('map-count');
+  const svg       = document.getElementById('world-map');
+  if (!dotsGroup || !svg) return;
 
-  // Wait for layout so offsetWidth is non-zero
-  function ready(fn) {
-    if (canvas.offsetWidth > 0) { fn(); }
-    else { requestAnimationFrame(() => ready(fn)); }
-  }
-
-  // Countries reached by Project Translate [lat, lon, name]
+  // SVG coordinate space is 1000×500 (equirectangular)
+  // x = (lon+180)/360*1000,  y = (90-lat)/180*500
   const countries = [
-    [38, -97,   'USA'],
-    [20,  77,   'India'],
-    [52,  20,   'Poland'],
-    [54,  -3,   'UK'],
-    [35,  38,   'Syria'],
-    [15, 101,   'Thailand'],
-    [56, -96,   'Canada'],
-    [40,  45,   'Armenia'],
-    [35, 104,   'China'],
-    [ 8, -66,   'Venezuela'],
-    [40,  -4,   'Spain'],
-    [52,   5,   'Netherlands'],
-    [ 4, 109,   'Malaysia'],
-    [30,  69,   'Pakistan'],
-    [60,  90,   'Russia'],
-    [ 1, 104,   'Singapore'],
-    [-25, 133,  'Australia'],
-    [42,   1.5, 'Andorra'],
-    [37, 128,   'South Korea'],
-    [47,  14,   'Austria'],
-    [51,  10,   'Germany'],
-    [ 4, -72,   'Colombia'],
-    [ 9, -80,   'Panama'],
-    [-34, -64,  'Argentina'],
-    [12, 123,   'Philippines'],
-    [14, 108,   'Vietnam'],
-    [47,   8,   'Switzerland'],
-    [42,  12,   'Italy'],
-    [32,  53,   'Iran'],
+    // [svgX, svgY, name]  — x=(lon+180)/360*1000, y=(90-lat)/180*500
+    [231, 144, 'USA'],
+    [714, 194, 'India'],
+    [556, 106, 'Poland'],
+    [492, 100, 'UK'],
+    [606, 153, 'Syria'],
+    [781, 208, 'Thailand'],
+    [233,  94, 'Canada'],
+    [625, 139, 'Armenia'],
+    [789, 153, 'China'],
+    [317, 228, 'Venezuela'],
+    [489, 139, 'Spain'],
+    [514, 106, 'Netherlands'],
+    [803, 239, 'Malaysia'],
+    [692, 167, 'Pakistan'],
+    [750,  83, 'Russia'],
+    [789, 247, 'Singapore'],
+    [869, 319, 'Australia'],
+    [504, 133, 'Andorra'],
+    [856, 147, 'South Korea'],
+    [539, 119, 'Austria'],
+    [528, 108, 'Germany'],
+    [300, 239, 'Colombia'],
+    [278, 225, 'Panama'],
+    [322, 344, 'Argentina'],
+    [842, 217, 'Philippines'],
+    [800, 211, 'Vietnam'],
+    [522, 119, 'Switzerland'],
+    [533, 133, 'Italy'],
+    [647, 161, 'Iran'],
   ];
 
-  const GREEN = '#3ddc6f';
-  const GRID  = 'rgba(61,220,111,.055)';
-  const LAND  = 'rgba(61,220,111,.09)';
-  const DOT_R = 4;
+  const NS = 'http://www.w3.org/2000/svg';
 
-  // Continent outlines [lat, lon] — stroke-only, no fill to avoid overlap artifacts
-  const CONTINENTS = [
-    // North America
-    [[71,-140],[70,-95],[60,-64],[47,-53],[44,-66],[35,-75],[25,-80],[25,-90],[22,-97],[22,-106],[29,-115],[32,-117],[38,-123],[49,-124],[56,-131],[60,-141],[71,-140]],
-    // Central America + Caribbean bridge
-    [[22,-97],[16,-90],[10,-84],[9,-80],[12,-72]],
-    // South America
-    [[12,-72],[10,-62],[5,-52],[0,-50],[-5,-35],[-10,-37],[-23,-43],[-34,-54],[-42,-63],[-52,-68],[-55,-65],[-40,-62],[-26,-48],[-22,-41],[-10,-37]],
-    // Europe outline
-    [[36,-6],[38,-9],[44,-9],[44,-2],[50,2],[51,4],[54,5],[57,8],[58,5],[61,5],[58,7],[55,10],[57,12],[60,18],[64,14],[68,14],[70,25],[71,28],[61,28],[58,22],[54,18],[51,15],[48,17],[45,14],[43,16],[38,15],[37,10],[36,-6]],
-    // Africa
-    [[37,10],[37,37],[32,42],[22,37],[12,44],[4,41],[-4,40],[-12,40],[-26,33],[-34,26],[-34,18],[-26,14],[-17,12],[-2,9],[5,3],[4,-3],[5,-5],[8,-5],[10,-14],[14,-17],[21,-17],[32,-8],[37,10]],
-    // Asia (Eurasia east of Ural)
-    [[71,50],[71,70],[71,130],[66,140],[59,140],[50,142],[43,132],[40,130],[28,121],[22,114],[20,110],[12,100],[8,99],[2,103],[1,104],[0,110],[-8,114],[5,117],[10,124],[14,121],[20,110],[24,90],[22,88],[12,80],[8,77],[14,74],[22,68],[30,62],[37,52],[38,56],[42,52],[41,41],[41,29],[38,27],[37,37],[47,38],[45,38],[46,34],[47,38],[48,50],[55,51],[68,55],[71,50]],
-    // Indian peninsula
-    [[22,68],[8,77],[12,80],[22,88],[22,68]],
-    // SE Asia Malay peninsula
-    [[12,100],[8,99],[4,101],[2,103],[4,103],[8,100],[12,100]],
-    // Australia
-    [[-14,130],[-12,130],[-14,124],[-22,114],[-30,115],[-35,118],[-35,138],[-39,147],[-38,148],[-30,153],[-22,150],[-15,145],[-12,136],[-14,130]],
-    // Japan (Honshu)
-    [[34,131],[36,136],[37,137],[40,141],[44,141],[43,143],[40,141],[35,137],[33,131],[34,131]],
-    // Greenland
-    [[76,-18],[70,-22],[66,-38],[64,-52],[68,-62],[72,-64],[76,-58],[82,-40],[83,-35],[83,-28],[76,-18]],
-    // Great Britain
-    [[50,-5],[50,1],[54,1],[58,0],[58,-4],[56,-6],[55,-5],[50,-5]],
-    // Iceland
-    [[64,-24],[63,-18],[65,-13],[66,-18],[64,-24]],
-    // Borneo
-    [[7,117],[5,116],[1,110],[0,109],[2,108],[5,115],[7,117]],
-    // New Guinea
-    [[-4,141],[-6,147],[-8,147],[-8,140],[-4,132],[-1,132],[-4,141]],
-  ];
+  // Build all dot groups hidden; reveal one by one on scroll
+  countries.forEach(([x, y, name], i) => {
+    const g = document.createElementNS(NS, 'g');
+    g.setAttribute('aria-label', name);
+    g.style.opacity = '0';
+    g.style.transition = 'opacity .35s';
 
-  function project(lat, lon, w, h) {
-    const x = ((lon + 180) / 360) * w;
-    const y = ((90 - lat) / 180) * h;
-    return [x, y];
-  }
+    // glow halo
+    const halo = document.createElementNS(NS, 'circle');
+    halo.setAttribute('cx', x); halo.setAttribute('cy', y); halo.setAttribute('r', '10');
+    halo.setAttribute('fill', 'rgba(61,220,111,.18)');
 
-  function resize() {
-    canvas.width  = canvas.offsetWidth  * window.devicePixelRatio;
-    canvas.height = canvas.offsetHeight * window.devicePixelRatio;
-    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-  }
+    // core dot
+    const dot = document.createElementNS(NS, 'circle');
+    dot.setAttribute('cx', x); dot.setAttribute('cy', y); dot.setAttribute('r', '3.5');
+    dot.setAttribute('fill', '#3ddc6f');
 
-  function drawGrid(w, h) {
-    ctx.strokeStyle = GRID;
-    ctx.lineWidth = 0.5;
-    for (let lat = -60; lat <= 90; lat += 30) {
-      const y = ((90 - lat) / 180) * h;
-      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
-    }
-    for (let lon = -180; lon <= 180; lon += 60) {
-      const x = ((lon + 180) / 360) * w;
-      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
-    }
-  }
+    // ping ring (CSS animated via transform-box trick: wrap in translated g)
+    const pg = document.createElementNS(NS, 'g');
+    pg.setAttribute('transform', `translate(${x},${y})`);
+    const ping = document.createElementNS(NS, 'circle');
+    ping.setAttribute('cx', '0'); ping.setAttribute('cy', '0'); ping.setAttribute('r', '3.5');
+    ping.setAttribute('fill', 'none');
+    ping.setAttribute('stroke', '#3ddc6f');
+    ping.setAttribute('stroke-width', '1.2');
+    ping.setAttribute('class', 'dot-pulse');
+    ping.style.animationDelay = (i * 0.08) + 's';
+    pg.appendChild(ping);
 
-  function drawContinents(w, h) {
-    ctx.strokeStyle = 'rgba(61,220,111,.22)';
-    ctx.lineWidth = 1;
-    ctx.lineJoin = 'round';
-    CONTINENTS.forEach(ring => {
-      // skip any ring with a bad coord (typo guard)
-      if (ring.some(p => isNaN(p[0]) || isNaN(p[1]))) return;
-      ctx.beginPath();
-      ring.forEach(([lat, lon], i) => {
-        const [x, y] = project(lat, lon, w, h);
-        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-      });
-      ctx.closePath();
-      ctx.fillStyle = 'rgba(61,220,111,.06)';
-      ctx.fill();
-      ctx.stroke();
-    });
-  }
+    g.appendChild(halo); g.appendChild(dot); g.appendChild(pg);
+    dotsGroup.appendChild(g);
+  });
 
   let revealed = 0;
-  let pulses = []; // {x, y, r, alpha}
-  let animating = false;
-
-  function drawDot(x, y, alpha) {
-    // glow
-    const grad = ctx.createRadialGradient(x, y, 0, x, y, DOT_R * 5);
-    grad.addColorStop(0, `rgba(61,220,111,${alpha * 0.35})`);
-    grad.addColorStop(1, 'rgba(61,220,111,0)');
-    ctx.beginPath();
-    ctx.arc(x, y, DOT_R * 5, 0, Math.PI * 2);
-    ctx.fillStyle = grad;
-    ctx.fill();
-    // core
-    ctx.beginPath();
-    ctx.arc(x, y, DOT_R, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(61,220,111,${alpha})`;
-    ctx.fill();
+  function revealNext() {
+    if (revealed >= countries.length) return;
+    dotsGroup.children[revealed].style.opacity = '1';
+    if (counter) counter.textContent = revealed + 1;
+    revealed++;
+    setTimeout(revealNext, 90);
   }
 
-  function render() {
-    const W = canvas.offsetWidth;
-    const H = canvas.offsetHeight;
-    ctx.clearRect(0, 0, W, H);
-    drawGrid(W, H);
-    drawContinents(W, H);
-
-    // draw revealed dots
-    for (let i = 0; i < revealed; i++) {
-      const [lat, lon] = countries[i];
-      const [x, y] = project(lat, lon, W, H);
-      drawDot(x, y, 1);
-    }
-
-    // pulse rings
-    pulses = pulses.filter(p => p.alpha > 0.01);
-    pulses.forEach(p => {
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(61,220,111,${p.alpha})`;
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-      p.r   += 1.8;
-      p.alpha *= 0.92;
-    });
-
-    if (animating) requestAnimationFrame(render);
-  }
-
-  function startAnimation() {
-    if (animating) return;
-    animating = true;
-    requestAnimationFrame(render);
-
-    const counter = document.getElementById('map-count');
-    let i = 0;
-    function revealNext() {
-      if (i >= countries.length) {
-        setTimeout(() => { animating = false; }, 800);
-        return;
-      }
-      revealed = i + 1;
-      const [lat, lon] = countries[i];
-      const W = canvas.offsetWidth, H = canvas.offsetHeight;
-      const [x, y] = project(lat, lon, W, H);
-      pulses.push({ x, y, r: DOT_R, alpha: 0.9 });
-      if (counter) counter.textContent = revealed;
-      i++;
-      setTimeout(revealNext, 80);
-    }
-    setTimeout(revealNext, 300);
-  }
-
-  ready(function () {
-    resize();
-    render(); // draw grid + continents immediately
-    window.addEventListener('resize', () => { resize(); if (!animating) render(); });
-
-    // Trigger dot animation when map enters viewport
-    const io = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting) { startAnimation(); io.disconnect(); }
-    }, { threshold: 0.1 });
-    io.observe(canvas);
-  });
+  const io = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting) { setTimeout(revealNext, 300); io.disconnect(); }
+  }, { threshold: 0.1 });
+  io.observe(svg);
 })();
 </script>
 </body>
