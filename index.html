@@ -1234,6 +1234,7 @@
 
     const ctx         = canvas.getContext('2d');
     const TOTAL       = 90;   // number of extracted frames
+    const SKIP        = 30;   // skip first ~1s (low-framerate zoom-out)
     const FRAME_PATH  = 'assets/video/frames/frame';
     const frames      = new Array(TOTAL);
     let   loaded      = 0;
@@ -1244,7 +1245,7 @@
     function resize() {
       canvas.width  = window.innerWidth;
       canvas.height = window.innerHeight;
-      draw(currentIdx < 0 ? 0 : currentIdx);
+      draw(currentIdx < 0 ? SKIP : currentIdx);
     }
     window.addEventListener('resize', resize);
     resize();
@@ -1280,7 +1281,7 @@
         hero.style.top = '0'; hero.style.bottom = 'auto';
         hero.style.left = '0'; hero.style.right = '0';
         const progress = Math.max(0, Math.min(1, -rect.top / scrollable));
-        const idx = Math.round(progress * (TOTAL - 1));
+        const idx = Math.round(SKIP + progress * (TOTAL - 1 - SKIP));
         if (bar) bar.style.width = (progress * 100) + '%';
         draw(idx);
       }
@@ -1299,8 +1300,8 @@
       frames[i] = img;
       img.onload = () => {
         loaded++;
-        // Draw frame 0 as soon as it's ready (shows immediately)
-        if (i === 0) draw(0);
+        // Draw first visible frame as soon as it's ready
+        if (i === SKIP) draw(SKIP);
         // Redraw current frame if this is the one we need
         if (i === currentIdx || currentIdx < 0) draw(i === 0 ? 0 : currentIdx);
       };

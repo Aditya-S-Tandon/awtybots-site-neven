@@ -193,6 +193,12 @@
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
 
+  // Wait for layout so offsetWidth is non-zero
+  function ready(fn) {
+    if (canvas.offsetWidth > 0) { fn(); }
+    else { requestAnimationFrame(() => ready(fn)); }
+  }
+
   // Countries reached by Project Translate [lat, lon, name]
   const countries = [
     [38, -97,   'USA'],
@@ -238,7 +244,7 @@
     // Central America + Caribbean bridge
     [[22,-97],[16,-90],[10,-84],[9,-80],[12,-72]],
     // South America
-    [[12,-72],[10,-62],[5,-52],[0,-50],[-5,-35],[-10,-37],[-23,-43],[-34,-54],[−42,-63],[-52,-68],[-55,-65],[-40,-62],[-26,-48],[-22,-41],[-10,-37]],
+    [[12,-72],[10,-62],[5,-52],[0,-50],[-5,-35],[-10,-37],[-23,-43],[-34,-54],[-42,-63],[-52,-68],[-55,-65],[-40,-62],[-26,-48],[-22,-41],[-10,-37]],
     // Europe outline
     [[36,-6],[38,-9],[44,-9],[44,-2],[50,2],[51,4],[54,5],[57,8],[58,5],[61,5],[58,7],[55,10],[57,12],[60,18],[64,14],[68,14],[70,25],[71,28],[61,28],[58,22],[54,18],[51,15],[48,17],[45,14],[43,16],[38,15],[37,10],[36,-6]],
     // Africa
@@ -382,14 +388,17 @@
     setTimeout(revealNext, 300);
   }
 
-  resize();
-  window.addEventListener('resize', () => { resize(); if (!animating) render(); });
+  ready(function () {
+    resize();
+    render(); // draw grid + continents immediately
+    window.addEventListener('resize', () => { resize(); if (!animating) render(); });
 
-  // Trigger when map enters viewport
-  const io = new IntersectionObserver(entries => {
-    if (entries[0].isIntersecting) { startAnimation(); io.disconnect(); }
-  }, { threshold: 0.3 });
-  io.observe(canvas);
+    // Trigger dot animation when map enters viewport
+    const io = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) { startAnimation(); io.disconnect(); }
+    }, { threshold: 0.1 });
+    io.observe(canvas);
+  });
 })();
 </script>
 </body>
