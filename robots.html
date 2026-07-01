@@ -97,10 +97,29 @@
     }
     .rslide.is-active .rslide__game { opacity: 1; transform: none; }
 
+    .rslide__desc {
+      max-width: 52ch; margin-bottom: 1.2rem;
+      opacity: 0; transform: translateY(8px);
+      transition: opacity .55s .38s, transform .55s .38s;
+    }
+    .rslide.is-active .rslide__desc { opacity: 1; transform: none; }
+    .rslide__desc ul {
+      list-style: none; display: flex; flex-direction: column; gap: .55rem;
+      padding: 0; margin: 0;
+    }
+    .rslide__desc li {
+      font-size: .8rem; line-height: 1.55; color: rgba(255,255,255,.65);
+      padding-left: 1rem; position: relative;
+    }
+    .rslide__desc li::before {
+      content: "—"; position: absolute; left: 0;
+      color: var(--green); font-weight: 700;
+    }
+
     .rslide__events {
       display: flex; flex-wrap: wrap; gap: .45rem;
       opacity: 0; transform: translateY(8px);
-      transition: opacity .55s .46s, transform .55s .46s;
+      transition: opacity .55s .56s, transform .55s .56s;
     }
     .rslide.is-active .rslide__events { opacity: 1; transform: none; }
     .rslide__events a, .rslide__events span {
@@ -186,6 +205,12 @@
         <div class="rslide__num">Season 10 · Reefscape℠</div>
         <h2 class="rslide__name"><span class="rslide__name-inner">Goldfire</span></h2>
         <div class="rslide__game">Reefscape℠ · 2026</div>
+        <div class="rslide__desc"><ul>
+          <li>Swerve drivetrain running 4 Kraken X60 drive motors and 4 Falcon 500 steer motors, geared for ~4.8 m/s free speed with a compact low-center-of-gravity frame.</li>
+          <li>Dual-roller coral intake mounted under the bumper, collecting from the reef floor in a single pass; feeds directly into a vertical indexer with two compression rollers.</li>
+          <li>2-stage elevator with a pivoting coral end-effector capable of scoring L1–L4. Algae removed from the reef via a spinning brush and scored in the processor or net.</li>
+          <li>Single-stage passive climb latches onto the cage bar in under 4 seconds; actuated by a servo-released spring latch.</li>
+        </ul></div>
         <div class="rslide__events">
           <a href="https://www.thebluealliance.com/event/2026txmca" target="_blank">@ FIT McAllen</a>
           <a href="https://www.thebluealliance.com/event/2026txcl2" target="_blank">@ FIT Space City 2</a>
@@ -205,6 +230,12 @@
         <div class="rslide__num">Season 9 · Reefscape℠</div>
         <h2 class="rslide__name"><span class="rslide__name-inner">Waverider</span></h2>
         <div class="rslide__game">Reefscape℠ · 2025</div>
+        <div class="rslide__desc"><ul>
+          <li>West Coast drivetrain with 6 colson wheels, 4 Falcon 500 drive motors, geared for ~4.2 m/s — designed for pushing defense and stability on the reef.</li>
+          <li>Over-the-bumper ground intake with polycarb guide ramps funneling coral onto two compression rollers, feeding upward into a fixed-angle shooter.</li>
+          <li>Single-stage linear elevator reaching L3. Fixed coral shooter launches pieces at a tuned angle into L3 and L4 slots from a short standoff distance.</li>
+          <li>Chain-driven climb hooks deploy via a motor-driven crank; robot pulls itself up to low-bar hang in the final 15 seconds of endgame.</li>
+        </ul></div>
         <div class="rslide__events">
           <a href="https://www.thebluealliance.com/event/2025txbel" target="_blank">@ FIT Belton</a>
           <a href="https://www.thebluealliance.com/event/2025txvic" target="_blank">@ FIT Victoria</a>
@@ -223,6 +254,12 @@
         <div class="rslide__num">Season 8 · Crescendo℠</div>
         <h2 class="rslide__name"><span class="rslide__name-inner">Jazz</span></h2>
         <div class="rslide__game">Crescendo℠ · 2024</div>
+        <div class="rslide__desc"><ul>
+          <li>Swerve drivetrain with 4 Falcon 500 drive motors, ~4.5 m/s free speed, and a low-profile bellypan to keep CG below the note intake clearance height.</li>
+          <li>Under-bumper floor intake using 4 silicon-wrapped aluminum rollers powdered by 2 Falcon 500s; robot drives over notes at full speed without stopping.</li>
+          <li>2 indexing rollers compress notes (≈270 mm width) into a slightly elliptical shape for tighter packaging, feeding into 4 vulcanized rubber rollers (2 top, 2 bottom) for the flywheel shooter.</li>
+          <li>Carbon fiber climbing arms latch onto the chain via hooks, then two winches retract to lift the robot; spring-loaded arms extend to enable trap scoring.</li>
+        </ul></div>
         <div class="rslide__events">
           <a href="https://www.thebluealliance.com/event/2024txkat" target="_blank">@ FIT Katy</a>
           <a href="https://www.thebluealliance.com/event/2024txsan" target="_blank">@ FIT San Antonio</a>
@@ -240,6 +277,11 @@
         <div class="rslide__num">Season 7 · Charged Up℠</div>
         <h2 class="rslide__name"><span class="rslide__name-inner">Greenlight</span></h2>
         <div class="rslide__game">Charged Up℠ · 2023</div>
+        <div class="rslide__desc"><ul>
+          <li>West Coast drivetrain, 6-wheel drop-center with 4 NEO motors and custom gearboxes; capable of sustained pushing force in the charging station zone.</li>
+          <li>Single-jointed arm with a pneumatic claw end-effector, picking up cones and cubes from the floor and human player station; arm reaches grid rows 2 and 3.</li>
+          <li>Auto-balance routine using a built-in gyro and PID controller to hold the charging station level within ±2° for maximum endgame points.</li>
+        </ul></div>
         <div class="rslide__events">
           <a href="https://www.thebluealliance.com/event/2023txcha" target="_blank">@ FIT Channelview</a>
           <a href="https://www.thebluealliance.com/event/2023txsan" target="_blank">@ FIT San Antonio</a>
@@ -257,6 +299,12 @@
         <div class="rslide__num">Season 6 · Rapid React℠</div>
         <h2 class="rslide__name"><span class="rslide__name-inner">Topspin</span></h2>
         <div class="rslide__game">Rapid React℠ · 2022</div>
+        <div class="rslide__desc"><ul>
+          <li>West Coast drivetrain, 6-wheel drop-center with 4 Falcon 500s; optimized for traversal speed between the fender and hub on the 2022 field.</li>
+          <li>Over-bumper cargo intake using compliant wheels and a pneumatically deployed arm; intakes from the floor or the human player station.</li>
+          <li>2-stage flywheel shooter with hood angle adjustment via a servo; tuned to shoot cargo into the upper hub from the fender and launchpad positions.</li>
+          <li>Traversal climb accomplished with a telescoping arm and a second shorter hook to step from low to mid to high to traversal rungs.</li>
+        </ul></div>
         <div class="rslide__events">
           <a href="https://www.thebluealliance.com/event/2022txcha" target="_blank">@ FIT Channelview</a>
           <a href="https://www.thebluealliance.com/event/2022txpas" target="_blank">@ FIT Pasadena</a>
@@ -274,6 +322,11 @@
         <div class="rslide__num">Season 5 · Infinite Recharge℠</div>
         <h2 class="rslide__name"><span class="rslide__name-inner">Ironhide</span></h2>
         <div class="rslide__game">Infinite Recharge℠ · 2020 & 2021</div>
+        <div class="rslide__desc"><ul>
+          <li>West Coast drivetrain with 4 NEO motors and a shifting gearbox; two-speed transmission for sprint speed in open field and pushing power near the control panel.</li>
+          <li>Ball intake using compliant wheels on a pivoting arm; feeds power cells through a hopper and into a flywheel shooter aimed at the outer and inner port.</li>
+          <li>Color sensor and motor for spinning the control panel to a target color in Stage 2 of the shield generator activation sequence.</li>
+        </ul></div>
         <div class="rslide__events">
           <a href="https://www.thebluealliance.com/event/2020txdri" target="_blank">@ FIT Dripping Springs</a>
           <a href="https://www.thebluealliance.com/event/2020txcha" target="_blank">@ FIT Channelview</a>
@@ -290,6 +343,11 @@
         <div class="rslide__num">Season 4 · Destination: Deep Space℠</div>
         <h2 class="rslide__name"><span class="rslide__name-inner">Sideswipe</span></h2>
         <div class="rslide__game">Destination: Deep Space℠ · 2019</div>
+        <div class="rslide__desc"><ul>
+          <li>West Coast drivetrain with pneumatic tires for traction on the hab platform; 4 CIM motors with a single-speed gearbox geared for ~3.8 m/s.</li>
+          <li>Pneumatic suction-cup mechanism picks up hatch panels from the loading station and scores them on the cargo ship and rocket ports at all three levels.</li>
+          <li>Cargo (ball) intake with a roller and hopper; deposits into cargo ship bays and rocket lower cargo ports. Robot climbs to Hab Level 2 via a ramp mechanism.</li>
+        </ul></div>
         <div class="rslide__events">
           <a href="https://www.thebluealliance.com/event/2019txcha" target="_blank">@ FIT Channelview</a>
           <a href="https://www.thebluealliance.com/event/2019txgre" target="_blank">@ FIT Greenville</a>
@@ -306,6 +364,12 @@
         <div class="rslide__num">Season 3 · FIRST Power Up℠</div>
         <h2 class="rslide__name"><span class="rslide__name-inner">Blurr</span></h2>
         <div class="rslide__game">FIRST Power Up℠ · 2018</div>
+        <div class="rslide__desc"><ul>
+          <li>West Coast drivetrain, 6 CIM motors across 3 gearboxes; optimized for fast cube cycling between the portal and the switch/scale.</li>
+          <li>Side-roller cube intake with polycarb intake arms that compress around the cube; intakes from the floor in any orientation without alignment.</li>
+          <li>2-stage telescoping elevator carrying the intake and shooter arm to scale height (~6 ft); cubes ejected via powered rollers at adjustable speed.</li>
+          <li>Single-rung climb: robot deploys a hook on the elevator and winches up in the final seconds to score ranking points from the scale bar.</li>
+        </ul></div>
         <div class="rslide__events">
           <a href="https://www.thebluealliance.com/event/2018txho" target="_blank">@ Lone Star Central</a>
           <a href="https://www.thebluealliance.com/event/2018txpa" target="_blank">@ Lone Star South</a>
@@ -323,6 +387,12 @@
         <div class="rslide__num">Season 2 · FIRST Steamworks℠</div>
         <h2 class="rslide__name"><span class="rslide__name-inner">Bumblebee</span></h2>
         <div class="rslide__game">FIRST Steamworks℠ · 2017</div>
+        <div class="rslide__desc"><ul>
+          <li>West Coast drivetrain with 4 CIM motors and a single-speed gearbox; low and wide frame for stability while traversing the low bar during auto.</li>
+          <li>Gear mechanism: passive funnel accepts gears from the human player station and delivers them to the airship peg via a pivoting arm with compliance.</li>
+          <li>Fuel (ball) collector feeds into a flywheel shooter aimed at the boiler; capable of high-goal and low-goal fuel scoring for pressure buildup.</li>
+          <li>Rope climb with a motorized spool — robot latches onto a rope and winds it up to reach the airship touchpad within the final 30 seconds.</li>
+        </ul></div>
         <div class="rslide__events">
           <a href="https://www.thebluealliance.com/event/2017txlu" target="_blank">@ Hub City</a>
           <a href="https://www.thebluealliance.com/event/2017txho" target="_blank">@ Lone Star Central</a>
@@ -342,6 +412,11 @@
         <div class="rslide__num">Season 1 · FIRST Stronghold℠</div>
         <h2 class="rslide__name"><span class="rslide__name-inner">Crosshairs</span></h2>
         <div class="rslide__game">FIRST Stronghold℠ · 2016 · Rookie Year</div>
+        <div class="rslide__desc"><ul>
+          <li>West Coast drivetrain, 6 CIM motors — our first competitive robot, built to traverse the outer works defenses reliably as a rookie team.</li>
+          <li>Flywheel shooter with a fixed hood angle tuned for the high goal from the batter position; balls fed by a single indexer roller from a floor hopper.</li>
+          <li>Low bar clearance designed in from day one — frame height kept under 12 inches to guarantee autonomous low bar crossing every match.</li>
+        </ul></div>
         <div class="rslide__events">
           <a href="https://www.thebluealliance.com/event/2016lake" target="_blank">@ Bayou Regional</a>
           <a href="https://www.thebluealliance.com/event/2016txho" target="_blank">@ Lone Star Regional</a>
