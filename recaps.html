@@ -246,6 +246,18 @@
     container.appendChild(el);
   });
 
+  // Make the entire track line clickable
+  document.querySelector('.stl-track').style.cursor = 'pointer';
+  document.querySelector('.stl-track').addEventListener('click', function(e) {
+    // Don't double-fire when clicking a milestone dot
+    if (e.target.closest('.stl-milestone')) return;
+    const pct = e.offsetX / this.offsetWidth;
+    const nearest = milestones.reduce((best, m) =>
+      Math.abs(m.pct / 100 - pct) < Math.abs(best.pct / 100 - pct) ? m : best
+    );
+    if (typeof goToDay === 'function') goToDay(nearest.dayIdx);
+  });
+
   const line = document.getElementById('stl-line');
   const dots = container.querySelectorAll('.stl-milestone');
   let fired = false;
