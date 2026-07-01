@@ -7,8 +7,42 @@
   <link rel="icon" type="image/x-icon" href="assets/images/icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Saira:wght@500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Saira:wght@500;600;700;800;900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link href="assets/css/site.css" rel="stylesheet">
+  <style>
+    .robots-hero {
+      padding: 7rem 0 3rem;
+      text-align: center;
+    }
+    .robots-hero__kicker {
+      font-family: var(--font-mono);
+      font-size: .7rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: .8rem;
+    }
+    .robots-hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 10vw, 7rem);
+      font-weight: 900;
+      letter-spacing: -.04em;
+      line-height: 1;
+      margin-bottom: 1rem;
+    }
+    .robots-hero p {
+      color: var(--muted);
+      font-size: 1.05rem;
+      max-width: 42ch;
+      margin: 0 auto;
+    }
+    /* Override rbot grid to show names properly */
+    .rbot__name { font-size: 1.6rem; }
+    .rbot__events { display: flex; flex-direction: column; gap: .3rem; }
+    .rbot__events a { color: var(--muted); text-decoration: none; font-size: .68rem; letter-spacing: .06em; transition: color .2s; }
+    .rbot__events a:hover { color: var(--green); }
+    .rbot__events a[style*="gold"] { color: var(--gold) !important; font-weight: 600; }
+  </style>
 </head>
 <body>
 
@@ -29,10 +63,11 @@
   </div>
 </header>
 
-<section class="section" style="padding-top:6rem;padding-bottom:2rem;text-align:center;">
+<section class="robots-hero">
   <div class="wrap">
-    <h1 style="font-family:var(--font-display);font-size:clamp(2rem,5vw,3.5rem);font-weight:800;margin-bottom:.75rem;">Our Robots</h1>
-    <p style="color:var(--muted);font-size:1.1rem;">Meet every robot we've built since our debut in 2016.</p>
+    <p class="robots-hero__kicker">FRC Team 5829 · Est. 2016</p>
+    <h1>10 Robots.<br><span style="color:var(--green)">10 Seasons.</span></h1>
+    <p>Every machine we've built — from our rookie year through the 2026 FIRST Championship.</p>
   </div>
 </section>
 
@@ -40,37 +75,37 @@
   <div class="wrap">
     <div class="robots">
 
-      <div class="rbot has-img" data-tilt>
+      <div class="rbot has-img reveal" data-tilt>
         <img class="rbot__img" src="assets/images/DSC01029.JPG" alt="Goldfire 2026">
         <div class="rbot__year">2026</div>
-        <div class="rbot__game">Rebuilt</div>
+        <div class="rbot__game">Reefscape℠</div>
         <div class="rbot__name">Goldfire</div>
         <div class="rbot__events">
           <a href="https://www.thebluealliance.com/event/2026txmca" target="_blank">@ FIT McAllen</a>
           <a href="https://www.thebluealliance.com/event/2026txcl2" target="_blank">@ FIT Space City 2</a>
           <a href="https://www.thebluealliance.com/event/2026txcmp1" target="_blank">@ State Championships</a>
           <a href="https://www.thebluealliance.com/event/2026arc" target="_blank">@ FIRST Championship (Archimedes)</a>
-          <a href="https://www.youtube.com/watch?v=BUQ0NH6PVAM" target="_blank" style="color:var(--gold);">Robot Reveal &rarr;</a>
+          <a href="https://www.youtube.com/watch?v=BUQ0NH6PVAM" target="_blank" style="color:var(--gold);">▶ Robot Reveal</a>
         </div>
       </div>
 
-      <div class="rbot has-img" data-tilt>
-        <img class="rbot__img" src="assets/images/Screenshot 2026-02-10 at 12.07.08 PM.png" alt="Waverider 2025">
+      <div class="rbot has-img reveal" data-tilt>
+        <img class="rbot__img" src="assets/images/robot-waverider-2025.png" alt="Waverider 2025">
         <div class="rbot__year">2025</div>
-        <div class="rbot__game">Reefscape</div>
+        <div class="rbot__game">Reefscape℠</div>
         <div class="rbot__name">Waverider</div>
         <div class="rbot__events">
           <a href="https://www.thebluealliance.com/event/2025txbel" target="_blank">@ FIT Belton</a>
           <a href="https://www.thebluealliance.com/event/2025txvic" target="_blank">@ FIT Victoria</a>
           <a href="https://www.thebluealliance.com/event/2025txcmp1" target="_blank">@ State Championships</a>
-          <a href="https://youtu.be/gssqTA2j7gg" target="_blank" style="color:var(--gold);">Robot Reveal &rarr;</a>
+          <a href="https://youtu.be/gssqTA2j7gg" target="_blank" style="color:var(--gold);">▶ Robot Reveal</a>
         </div>
       </div>
 
-      <div class="rbot has-img" data-tilt>
-        <img class="rbot__img" src="assets/images/Screenshot 2026-02-10 at 12.46.20 PM.png" alt="Jazz 2024">
+      <div class="rbot has-img reveal" data-tilt>
+        <img class="rbot__img" src="assets/images/robot-jazz-2024.png" alt="Jazz 2024">
         <div class="rbot__year">2024</div>
-        <div class="rbot__game">Crescendo</div>
+        <div class="rbot__game">Crescendo℠</div>
         <div class="rbot__name">Jazz</div>
         <div class="rbot__events">
           <a href="https://www.thebluealliance.com/event/2024txkat" target="_blank">@ FIT Katy</a>
@@ -79,10 +114,10 @@
         </div>
       </div>
 
-      <div class="rbot has-img" data-tilt>
-        <img class="rbot__img" src="assets/images/Screenshot 2026-02-10 at 1.07.08 PM.png" alt="Greenlight 2023">
+      <div class="rbot has-img reveal" data-tilt>
+        <img class="rbot__img" src="assets/images/robot-greenlight-2023.png" alt="Greenlight 2023">
         <div class="rbot__year">2023</div>
-        <div class="rbot__game">Charged Up</div>
+        <div class="rbot__game">Charged Up℠</div>
         <div class="rbot__name">Greenlight</div>
         <div class="rbot__events">
           <a href="https://www.thebluealliance.com/event/2023txcha" target="_blank">@ FIT Channelview</a>
@@ -91,10 +126,10 @@
         </div>
       </div>
 
-      <div class="rbot has-img" data-tilt>
-        <img class="rbot__img" src="assets/images/Topspin (Better) - 2022.JPEG" alt="Topspin 2022">
+      <div class="rbot has-img reveal" data-tilt>
+        <img class="rbot__img" src="assets/images/robot-topspin-2022.jpg" alt="Topspin 2022">
         <div class="rbot__year">2022</div>
-        <div class="rbot__game">Rapid React</div>
+        <div class="rbot__game">Rapid React℠</div>
         <div class="rbot__name">Topspin</div>
         <div class="rbot__events">
           <a href="https://www.thebluealliance.com/event/2022txcha" target="_blank">@ FIT Channelview</a>
@@ -103,10 +138,10 @@
         </div>
       </div>
 
-      <div class="rbot has-img" data-tilt>
-        <img class="rbot__img" src="assets/images/Screenshot 2026-02-10 at 1.29.55 PM.png" alt="Ironhide 2021">
+      <div class="rbot has-img reveal" data-tilt>
+        <img class="rbot__img" src="assets/images/robot-ironhide-2021.png" alt="Ironhide 2021">
         <div class="rbot__year">2021 &amp; 2020</div>
-        <div class="rbot__game">Infinite Recharge</div>
+        <div class="rbot__game">Infinite Recharge℠</div>
         <div class="rbot__name">Ironhide</div>
         <div class="rbot__events">
           <a href="https://www.thebluealliance.com/event/2020txdri" target="_blank">@ FIT Dripping Springs</a>
@@ -114,10 +149,10 @@
         </div>
       </div>
 
-      <div class="rbot has-img" data-tilt>
-        <img class="rbot__img" src="assets/images/Screenshot 2026-02-10 at 1.38.14 PM.png" alt="Sideswipe 2019">
+      <div class="rbot has-img reveal" data-tilt>
+        <img class="rbot__img" src="assets/images/robot-sideswipe-2019.png" alt="Sideswipe 2019">
         <div class="rbot__year">2019</div>
-        <div class="rbot__game">Destination: Deep Space</div>
+        <div class="rbot__game">Destination: Deep Space℠</div>
         <div class="rbot__name">Sideswipe</div>
         <div class="rbot__events">
           <a href="https://www.thebluealliance.com/event/2019txcha" target="_blank">@ FIT Channelview</a>
@@ -125,10 +160,10 @@
         </div>
       </div>
 
-      <div class="rbot has-img" data-tilt>
-        <img class="rbot__img" src="assets/images/Screenshot 2026-02-10 at 1.40.08 PM.png" alt="Blurr 2018">
+      <div class="rbot has-img reveal" data-tilt>
+        <img class="rbot__img" src="assets/images/robot-blurr-2018.png" alt="Blurr 2018">
         <div class="rbot__year">2018</div>
-        <div class="rbot__game">FIRST Power Up</div>
+        <div class="rbot__game">FIRST Power Up℠</div>
         <div class="rbot__name">Blurr</div>
         <div class="rbot__events">
           <a href="https://www.thebluealliance.com/event/2018txho" target="_blank">@ Lone Star Central</a>
@@ -137,29 +172,29 @@
         </div>
       </div>
 
-      <div class="rbot has-img" data-tilt>
-        <img class="rbot__img" src="assets/images/Screenshot 2026-02-10 at 1.42.42 PM.png" alt="Bumblebee 2017">
+      <div class="rbot has-img reveal" data-tilt>
+        <img class="rbot__img" src="assets/images/robot-bumblebee-2017.png" alt="Bumblebee 2017">
         <div class="rbot__year">2017</div>
-        <div class="rbot__game">FIRST Steamworks</div>
+        <div class="rbot__game">FIRST Steamworks℠</div>
         <div class="rbot__name">Bumblebee</div>
         <div class="rbot__events">
           <a href="https://www.thebluealliance.com/event/2017txlu" target="_blank">@ Hub City</a>
           <a href="https://www.thebluealliance.com/event/2017txho" target="_blank">@ Lone Star Central</a>
           <a href="https://www.thebluealliance.com/event/2017txwo" target="_blank">@ Lone Star North</a>
           <a href="https://www.thebluealliance.com/event/2017tur" target="_blank">@ World Championships (Turing)</a>
-          <a href="https://www.youtube.com/watch?v=FuC6wsSAUl0" target="_blank" style="color:var(--gold);">Robot Reveal &rarr;</a>
+          <a href="https://www.youtube.com/watch?v=FuC6wsSAUl0" target="_blank" style="color:var(--gold);">▶ Robot Reveal</a>
         </div>
       </div>
 
-      <div class="rbot has-img" data-tilt>
-        <img class="rbot__img" src="assets/images/Screenshot 2026-02-10 at 1.45.59 PM.png" alt="Crosshairs 2016">
+      <div class="rbot has-img reveal" data-tilt>
+        <img class="rbot__img" src="assets/images/robot-crosshairs-2016.png" alt="Crosshairs 2016">
         <div class="rbot__year">2016</div>
-        <div class="rbot__game">FIRST Stronghold</div>
+        <div class="rbot__game">FIRST Stronghold℠</div>
         <div class="rbot__name">Crosshairs</div>
         <div class="rbot__events">
           <a href="https://www.thebluealliance.com/event/2016lake" target="_blank">@ Bayou</a>
           <a href="https://www.thebluealliance.com/event/2016txho" target="_blank">@ Lone Star</a>
-          <a href="https://www.youtube.com/watch?v=SLxID53bKQc" target="_blank" style="color:var(--gold);">Robot Reveal &rarr;</a>
+          <a href="https://www.youtube.com/watch?v=SLxID53bKQc" target="_blank" style="color:var(--gold);">▶ Robot Reveal</a>
         </div>
       </div>
 
@@ -174,6 +209,5 @@
   </div>
 </footer>
 <script src="assets/js/site.js"></script>
-
 </body>
 </html>

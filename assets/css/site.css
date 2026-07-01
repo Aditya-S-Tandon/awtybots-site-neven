@@ -376,3 +376,67 @@ h1,h2,h3,h4 { font-family: var(--font-display); font-weight: 800; line-height: 1
 a:focus-visible, button:focus-visible, .btn:focus-visible {
   outline: 2px solid var(--green); outline-offset: 3px; border-radius: 6px;
 }
+
+/* ── Behind the build: resource cards ── */
+.build-resources {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-top: 2.5rem;
+}
+.bres-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.1rem 1.2rem;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--text);
+  transition: background .2s, border-color .2s, transform .2s;
+}
+.bres-card:hover {
+  background: rgba(61,220,111,.07);
+  border-color: rgba(61,220,111,.35);
+  transform: translateY(-2px);
+}
+.bres-card__icon {
+  width: 2.6rem;
+  height: 2.6rem;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: rgba(61,220,111,.10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bres-card__icon img {
+  width: 1.4rem;
+  height: 1.4rem;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+.bres-card__label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: .9rem;
+  letter-spacing: .01em;
+  margin-bottom: .15rem;
+}
+.bres-card__desc {
+  font-size: .75rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+.bres-card__arrow {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: var(--muted);
+  font-size: 1rem;
+  transition: color .2s, transform .2s;
+}
+.bres-card:hover .bres-card__arrow {
+  color: var(--green);
+  transform: translateX(3px);
+}
