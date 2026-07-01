@@ -459,3 +459,50 @@ a:focus-visible, button:focus-visible, .btn:focus-visible {
 .rbot:hover {
   box-shadow: 0 0 0 1px rgba(61,220,111,.4), 0 8px 32px rgba(61,220,111,.12);
 }
+
+/* ── Page transition overlay ── */
+#pt {
+  /* element created by JS; base styles set inline */
+}
+
+/* ── Cinematic inner-page H1 shimmer ── */
+@keyframes h1-shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+.page-h1-cin {
+  background: linear-gradient(
+    105deg,
+    var(--text) 40%,
+    rgba(61,220,111,.7) 50%,
+    var(--text) 60%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: h1-shimmer 2.4s linear 1 .5s;
+}
+/* After animation: lock to solid text color */
+.page-h1-cin.reveal-done {
+  background: none;
+  -webkit-text-fill-color: unset;
+  color: var(--text);
+}
+
+/* ── Robot carousel: keep nav above page transition overlay ── */
+.rcar-nav { z-index: 200; }
+
+/* ── Events: season bar responsive ── */
+@media (max-width:560px) {
+  .season-bar { flex-direction:column; }
+  .sstat { border-right:none; border-bottom:1px solid var(--line); }
+  .sstat:last-child { border-bottom:none; }
+}
+
+/* ── Stepper: tighten on mobile ── */
+@media (max-width:480px) {
+  .step-card__body { padding:1.2rem 1.2rem; }
+  .step-nav { gap:.5rem; }
+  .step-dots { display:none; }
+}

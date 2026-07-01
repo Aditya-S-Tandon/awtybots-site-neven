@@ -7,15 +7,114 @@
   <link rel="icon" type="image/x-icon" href="assets/images/icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Saira:wght@500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Saira:wght@500;600;700;800;900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link href="assets/css/site.css" rel="stylesheet">
   <style>
-    .event-list { list-style:none; display:flex; flex-direction:column; gap:1.6rem; }
-    .event-list > li { border:1px solid var(--line); border-left:2px solid var(--green); border-radius:12px; padding:1.4rem 1.6rem; background:var(--surface); }
-    .event-list > li > strong { font-family:var(--font-display); font-size:1.1rem; display:block; margin-bottom:.6rem; }
-    .event-list > li > a { font-family:var(--font-display); font-size:1.1rem; color:var(--green); display:block; margin-bottom:.6rem; font-weight:700; }
-    .event-list ul { padding-left:1.2rem; margin-top:.6rem; color:var(--muted); font-size:.92rem; line-height:1.8; }
-    .event-list ul li::marker { color:var(--green); }
+    /* ── Season stats bar ── */
+    .season-bar {
+      display: flex; flex-wrap: wrap; gap: 0;
+      border: 1px solid var(--line); border-radius: 14px;
+      overflow: hidden; margin-bottom: 3rem;
+    }
+    .sstat {
+      flex: 1 1 120px; padding: 1.4rem 1.6rem;
+      border-right: 1px solid var(--line);
+      background: var(--surface);
+    }
+    .sstat:last-child { border-right: none; }
+    .sstat__num {
+      font-family: var(--font-display); font-weight: 900;
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      letter-spacing: -.03em; line-height: 1;
+      color: var(--green);
+    }
+    .sstat__num.gold { color: var(--gold); }
+    .sstat__label {
+      font-family: var(--font-mono); font-size: .62rem;
+      letter-spacing: .16em; text-transform: uppercase;
+      color: var(--muted); margin-top: .35rem;
+    }
+
+    /* ── Section heading ── */
+    .events-section-head {
+      display: flex; align-items: center; gap: 1rem;
+      margin-bottom: 1.6rem;
+    }
+    .events-section-head h2 {
+      font-family: var(--font-display); font-size: 1.1rem; font-weight: 700;
+      letter-spacing: .06em; text-transform: uppercase;
+    }
+    .events-section-head::after {
+      content: ""; flex: 1; height: 1px; background: var(--line);
+    }
+
+    /* ── Event card ── */
+    .ecard {
+      border: 1px solid var(--line); border-radius: 14px;
+      background: var(--surface); margin-bottom: 1.2rem;
+      overflow: hidden; transition: border-color .2s;
+    }
+    .ecard:hover { border-color: rgba(61,220,111,.3); }
+
+    .ecard__head {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 1rem; padding: 1.4rem 1.6rem 0;
+    }
+    .ecard__name {
+      font-family: var(--font-display); font-size: 1.15rem; font-weight: 700;
+      color: var(--text); text-decoration: none;
+      transition: color .2s;
+    }
+    a.ecard__name:hover { color: var(--green); }
+    .ecard__date {
+      font-family: var(--font-mono); font-size: .65rem;
+      letter-spacing: .1em; color: var(--muted); margin-top: .35rem;
+    }
+    .ecard__rank {
+      font-family: var(--font-display); font-weight: 900;
+      font-size: 1.8rem; letter-spacing: -.04em;
+      color: var(--green); white-space: nowrap; line-height: 1;
+      flex-shrink: 0;
+    }
+    .ecard__rank.gold { color: var(--gold); }
+
+    .ecard__body { padding: 1rem 1.6rem 1.4rem; }
+
+    /* record chips */
+    .ecard__chips { display: flex; flex-wrap: wrap; gap: .45rem; margin-bottom: 1rem; }
+    .chip {
+      font-family: var(--font-mono); font-size: .65rem; letter-spacing: .1em;
+      border-radius: 100px; padding: .3rem .8rem; font-weight: 600;
+    }
+    .chip-w { background: rgba(61,220,111,.12); color: var(--green); border: 1px solid rgba(61,220,111,.25); }
+    .chip-l { background: rgba(255,80,80,.08); color: #f07070; border: 1px solid rgba(255,80,80,.2); }
+    .chip-pts { background: rgba(232,181,74,.1); color: var(--gold); border: 1px solid rgba(232,181,74,.25); }
+    .chip-div { background: rgba(255,255,255,.06); color: var(--muted); border: 1px solid var(--line); }
+
+    /* win/loss bar */
+    .wl-bar { height: 3px; border-radius: 2px; background: var(--line); margin-bottom: 1rem; overflow: hidden; }
+    .wl-bar__fill {
+      height: 100%; background: var(--green); border-radius: 2px;
+      width: 0%; transition: width 1s cubic-bezier(.22,.61,.36,1);
+    }
+
+    /* awards */
+    .ecard__awards { display: flex; flex-direction: column; gap: .4rem; }
+    .ecard__award {
+      font-size: .82rem; color: var(--muted);
+      display: flex; align-items: center; gap: .5rem;
+    }
+    .ecard__award::before { content: "◆"; color: var(--gold); font-size: .5rem; flex-shrink: 0; }
+
+    /* worlds card accent */
+    .ecard--worlds { border-color: rgba(232,181,74,.3); }
+    .ecard--worlds .ecard__head { border-top: 2px solid var(--gold); margin-top: -1px; }
+
+    @media (max-width: 560px) {
+      .season-bar { flex-direction: column; }
+      .sstat { border-right: none; border-bottom: 1px solid var(--line); }
+      .sstat:last-child { border-bottom: none; }
+    }
   </style>
 </head>
 <body>
@@ -37,71 +136,153 @@
   </div>
 </header>
 
-<section class="section" style="padding-top:6rem;padding-bottom:2rem;text-align:center;">
-  <div class="wrap">
-    <h1 style="font-family:var(--font-display);font-size:clamp(2rem,5vw,3.5rem);font-weight:800;margin-bottom:.75rem;">Events</h1>
-    <p style="color:var(--muted);font-size:1.1rem;">See our 2026 competition season below.</p>
-  </div>
-</section>
-
-<section class="section" style="padding-top:1rem;">
+<section class="section" style="padding-top:6rem;padding-bottom:2rem;">
   <div class="wrap" style="max-width:860px;">
 
-    <h2 style="font-family:var(--font-display);font-size:1.5rem;font-weight:700;margin-bottom:1.6rem;color:var(--green);">2026 Season</h2>
+    <p class="eyebrow" style="margin-bottom:.8rem;">2026 Competition Season</p>
+    <h1 class="page-hero-title reveal" style="font-family:var(--font-display);font-size:clamp(2.5rem,7vw,5rem);font-weight:900;letter-spacing:-.04em;line-height:.95;margin-bottom:1.2rem;">
+      FIT District<br><span style="color:var(--green);">→ Worlds.</span>
+    </h1>
+    <p style="color:var(--muted);font-size:1rem;margin-bottom:2.5rem;">Four events. Three divisions. One shot at the championship.</p>
 
-    <ul class="event-list">
-      <li>
-        <a href="https://www.thebluealliance.com/event/2026txmca" target="_blank">FIT District McAllen Event</a>
-        <span style="color:var(--muted);font-size:.9rem;">March 12–14, Week 2 · McAllen Convention Center, McAllen, TX</span>
-        <ul>
-          <li>Rank 3 with a record of 9-3-0</li>
-          <li>District Event Finalist (Playoff record 3-3-0)</li>
-          <li>Team Sustainability Award presented by Dow</li>
-          <li>58 District Points earned</li>
-        </ul>
-      </li>
-      <li>
-        <a href="https://www.thebluealliance.com/event/2026txcl2" target="_blank">FIT District Space City @ Friendswood Event #2</a>
-        <span style="color:var(--muted);font-size:.9rem;">April 2–4, Week 5 · Clear Brook High School, Friendswood, TX</span>
-        <ul>
-          <li>Rank 4 with a record of 9-3-0</li>
-          <li>District Event 3rd Place Finisher (Playoff record 3-2-0)</li>
-          <li>Industrial Design Award</li>
-          <li>District Championship FIRST Leadership Award Semi-Finalist (Chanya M)</li>
-          <li>50 District Points earned</li>
-        </ul>
-      </li>
-      <li>
-        <a href="https://www.thebluealliance.com/event/2026txcmp" target="_blank">FIT District Championships</a>
-        <span style="color:var(--muted);font-size:.9rem;">April 15–18, Week 7 · NRG Arena, Houston, TX</span>
-        <ul>
-          <li>Mercury Division</li>
-          <li>Rank 19 with a record of 6-6-0</li>
-          <li>District Event Quarter-Finalist (Playoff record 2-2-0)</li>
-          <li>Creativity Award sponsored by Rockwell Automation</li>
-          <li>105 District Points earned</li>
-        </ul>
-      </li>
-      <li>
-        <a href="https://www.thebluealliance.com/event/2026cmptx" target="_blank">FIRST Championship</a>
-        <span style="color:var(--muted);font-size:.9rem;">April 29 – May 2, Week 9 · George R. Brown Convention Center, Houston, TX</span>
-        <ul>
-          <li><a href="https://www.thebluealliance.com/event/2026arc" target="_blank">Archimedes Division</a></li>
-        </ul>
-      </li>
-    </ul>
+    <!-- Season stats -->
+    <div class="season-bar reveal">
+      <div class="sstat">
+        <div class="sstat__num"><span data-count="33">0</span></div>
+        <div class="sstat__label">Total Wins</div>
+      </div>
+      <div class="sstat">
+        <div class="sstat__num"><span data-count="17">0</span></div>
+        <div class="sstat__label">Total Losses</div>
+      </div>
+      <div class="sstat">
+        <div class="sstat__num gold"><span data-count="3">0</span></div>
+        <div class="sstat__label">Awards Won</div>
+      </div>
+      <div class="sstat">
+        <div class="sstat__num gold"><span data-count="213">0</span></div>
+        <div class="sstat__label">District Points</div>
+      </div>
+    </div>
 
-    <h2 style="font-family:var(--font-display);font-size:1.5rem;font-weight:700;margin:2.4rem 0 1.6rem;color:var(--gold);">Offseason Events</h2>
+    <!-- 2026 season -->
+    <div class="events-section-head">
+      <h2 style="color:var(--green);">District Season</h2>
+    </div>
 
-    <ul class="event-list">
-      <li>
-        <a href="https://www.thebluealliance.com/event/2026txhou1" target="_blank">Texas Robotics Invitational</a>
-        <span style="color:var(--muted);font-size:.9rem;">June 25–27 · Strake Jesuit College Preparatory, Houston, TX</span>
-      </li>
-    </ul>
+    <!-- McAllen -->
+    <div class="ecard reveal">
+      <div class="ecard__head">
+        <div>
+          <a class="ecard__name" href="https://www.thebluealliance.com/event/2026txmca" target="_blank">FIT District McAllen Event</a>
+          <div class="ecard__date">March 12–14 · Week 2 · McAllen Convention Center, TX</div>
+        </div>
+        <div class="ecard__rank">#3</div>
+      </div>
+      <div class="ecard__body">
+        <div class="wl-bar"><div class="wl-bar__fill" data-win="9" data-loss="3"></div></div>
+        <div class="ecard__chips">
+          <span class="chip chip-w">9 Wins</span>
+          <span class="chip chip-l">3 Losses</span>
+          <span class="chip chip-div">Finalist</span>
+          <span class="chip chip-pts">58 pts</span>
+        </div>
+        <div class="ecard__awards">
+          <div class="ecard__award">Team Sustainability Award presented by Dow</div>
+        </div>
+      </div>
+    </div>
 
-    <p style="margin-top:2rem;color:var(--muted);font-size:.95rem;">This list will be updated as the season progresses. See our full season and awards history at <a href="https://frc-events.firstinspires.org/team/5829" target="_blank">firstinspires.org</a> and <a href="https://www.thebluealliance.com/team/5829/2026" target="_blank">thebluealliance.com</a>.</p>
+    <!-- Space City -->
+    <div class="ecard reveal">
+      <div class="ecard__head">
+        <div>
+          <a class="ecard__name" href="https://www.thebluealliance.com/event/2026txcl2" target="_blank">FIT District Space City @ Friendswood #2</a>
+          <div class="ecard__date">April 2–4 · Week 5 · Clear Brook High School, Friendswood, TX</div>
+        </div>
+        <div class="ecard__rank">#4</div>
+      </div>
+      <div class="ecard__body">
+        <div class="wl-bar"><div class="wl-bar__fill" data-win="9" data-loss="3"></div></div>
+        <div class="ecard__chips">
+          <span class="chip chip-w">9 Wins</span>
+          <span class="chip chip-l">3 Losses</span>
+          <span class="chip chip-div">3rd Place</span>
+          <span class="chip chip-pts">50 pts</span>
+        </div>
+        <div class="ecard__awards">
+          <div class="ecard__award">Industrial Design Award</div>
+          <div class="ecard__award">District Championship FIRST Leadership Award Semi-Finalist — Chanya M.</div>
+        </div>
+      </div>
+    </div>
 
+    <!-- State -->
+    <div class="ecard reveal">
+      <div class="ecard__head">
+        <div>
+          <a class="ecard__name" href="https://www.thebluealliance.com/event/2026txcmp" target="_blank">FIT District Championships</a>
+          <div class="ecard__date">April 15–18 · Week 7 · NRG Arena, Houston, TX</div>
+        </div>
+        <div class="ecard__rank">#19</div>
+      </div>
+      <div class="ecard__body">
+        <div class="wl-bar"><div class="wl-bar__fill" data-win="6" data-loss="6"></div></div>
+        <div class="ecard__chips">
+          <span class="chip chip-w">6 Wins</span>
+          <span class="chip chip-l">6 Losses</span>
+          <span class="chip chip-div">Mercury Division</span>
+          <span class="chip chip-div">Quarter-Finalist</span>
+          <span class="chip chip-pts">105 pts</span>
+        </div>
+        <div class="ecard__awards">
+          <div class="ecard__award">Creativity Award sponsored by Rockwell Automation</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FIRST Championship -->
+    <div class="ecard ecard--worlds reveal">
+      <div class="ecard__head">
+        <div>
+          <a class="ecard__name" href="https://www.thebluealliance.com/event/2026arc" target="_blank">FIRST Championship — Archimedes Division</a>
+          <div class="ecard__date">April 29 – May 2 · Week 9 · George R. Brown Convention Center, Houston, TX</div>
+        </div>
+        <div class="ecard__rank gold">★</div>
+      </div>
+      <div class="ecard__body">
+        <div class="ecard__chips">
+          <span class="chip chip-pts">Worlds Qualifier</span>
+          <span class="chip chip-div">Archimedes Division</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Offseason -->
+    <div class="events-section-head" style="margin-top:2.4rem;">
+      <h2 style="color:var(--muted);">Offseason</h2>
+    </div>
+
+    <div class="ecard reveal">
+      <div class="ecard__head">
+        <div>
+          <a class="ecard__name" href="https://www.thebluealliance.com/event/2026txhou1" target="_blank">Texas Robotics Invitational</a>
+          <div class="ecard__date">June 25–27 · Strake Jesuit College Preparatory, Houston, TX</div>
+        </div>
+      </div>
+      <div class="ecard__body" style="padding-top:.6rem;">
+        <div class="ecard__chips">
+          <span class="chip chip-div">Offseason</span>
+        </div>
+      </div>
+    </div>
+
+    <p style="margin-top:2rem;color:var(--muted-2);font-size:.85rem;">
+      Full history at
+      <a href="https://frc-events.firstinspires.org/team/5829" target="_blank" style="color:var(--muted);">firstinspires.org</a>
+      and
+      <a href="https://www.thebluealliance.com/team/5829/2026" target="_blank" style="color:var(--muted);">thebluealliance.com</a>.
+    </p>
   </div>
 </section>
 
@@ -111,7 +292,23 @@
     <p>Live data: <a href="https://www.thebluealliance.com/team/5829" target="_blank">The Blue Alliance</a> · <a href="https://frc-events.firstinspires.org/team/5829" target="_blank">FIRST</a><br>Site maintained by the AwtyBots · <a href="#">Back to top ↑</a></p>
   </div>
 </footer>
-<script src="assets/js/site.js"></script>
 
+<script src="assets/js/site.js"></script>
+<script>
+// Animate W/L bars on scroll
+(function () {
+  const bars = document.querySelectorAll('.wl-bar__fill[data-win]');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const el = e.target;
+      const w = +el.dataset.win, l = +el.dataset.loss;
+      el.style.width = ((w / (w + l)) * 100) + '%';
+      io.unobserve(el);
+    });
+  }, { threshold: 0.5 });
+  bars.forEach(b => io.observe(b));
+})();
+</script>
 </body>
 </html>

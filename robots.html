@@ -10,38 +10,149 @@
   <link href="https://fonts.googleapis.com/css2?family=Saira:wght@500;600;700;800;900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link href="assets/css/site.css" rel="stylesheet">
   <style>
-    .robots-hero {
-      padding: 7rem 0 3rem;
-      text-align: center;
+    body { overflow-x: hidden; }
+
+    /* ── Full-bleed carousel ── */
+    .rcar-wrap { position: relative; width: 100vw; margin-left: calc(50% - 50vw); }
+    .rcar {
+      display: flex;
+      overflow-x: scroll;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      height: calc(100vh - 64px);
     }
-    .robots-hero__kicker {
-      font-family: var(--font-mono);
-      font-size: .7rem;
-      letter-spacing: .18em;
-      text-transform: uppercase;
-      color: var(--green);
-      margin-bottom: .8rem;
+    .rcar::-webkit-scrollbar { display: none; }
+
+    .rslide {
+      flex: 0 0 100vw;
+      height: 100%;
+      scroll-snap-align: start;
+      position: relative;
+      overflow: hidden;
     }
-    .robots-hero h1 {
+    .rslide__bg {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: center 20%;
+      transform: scale(1.06);
+      transition: transform 1.4s cubic-bezier(.25,.46,.45,.94);
+    }
+    .rslide.is-active .rslide__bg { transform: scale(1); }
+
+    .rslide__overlay {
+      position: absolute; inset: 0;
+      background:
+        linear-gradient(to right, rgba(10,14,12,.92) 30%, rgba(10,14,12,.55) 62%, rgba(10,14,12,.18) 100%),
+        linear-gradient(to top, rgba(10,14,12,.98) 0%, transparent 45%);
+    }
+
+    .rslide__watermark {
+      position: absolute;
+      right: -0.04em; bottom: -0.18em;
       font-family: var(--font-display);
-      font-size: clamp(3rem, 10vw, 7rem);
       font-weight: 900;
-      letter-spacing: -.04em;
+      font-size: clamp(10rem, 28vw, 22rem);
       line-height: 1;
-      margin-bottom: 1rem;
+      letter-spacing: -.06em;
+      color: rgba(255,255,255,.035);
+      pointer-events: none; user-select: none;
     }
-    .robots-hero p {
-      color: var(--muted);
-      font-size: 1.05rem;
-      max-width: 42ch;
-      margin: 0 auto;
+
+    .rslide__content {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: clamp(2rem,5vw,4rem) clamp(1.5rem,6vw,5rem);
+      padding-bottom: clamp(5rem,9vw,7rem);
     }
-    /* Override rbot grid to show names properly */
-    .rbot__name { font-size: 1.6rem; }
-    .rbot__events { display: flex; flex-direction: column; gap: .3rem; }
-    .rbot__events a { color: var(--muted); text-decoration: none; font-size: .68rem; letter-spacing: .06em; transition: color .2s; }
-    .rbot__events a:hover { color: var(--green); }
-    .rbot__events a[style*="gold"] { color: var(--gold) !important; font-weight: 600; }
+
+    .rslide__num {
+      font-family: var(--font-mono); font-size: .65rem;
+      letter-spacing: .22em; text-transform: uppercase;
+      color: var(--green); margin-bottom: .7rem;
+      opacity: 0; transform: translateY(14px);
+      transition: opacity .55s .08s, transform .55s .08s;
+    }
+    .rslide.is-active .rslide__num { opacity: 1; transform: none; }
+
+    .rslide__name {
+      font-family: var(--font-display); font-size: clamp(4rem,11vw,9rem);
+      font-weight: 900; letter-spacing: -.04em; line-height: .88;
+      margin: 0 0 .55rem; overflow: hidden;
+    }
+    .rslide__name-inner {
+      display: block;
+      transform: translateY(110%);
+      transition: transform .85s cubic-bezier(.22,.61,.36,1) .1s;
+    }
+    .rslide.is-active .rslide__name-inner { transform: none; }
+
+    .rslide__game {
+      font-family: var(--font-mono); font-size: .72rem;
+      letter-spacing: .14em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 1.1rem;
+      opacity: 0; transform: translateY(10px);
+      transition: opacity .55s .32s, transform .55s .32s;
+    }
+    .rslide.is-active .rslide__game { opacity: 1; transform: none; }
+
+    .rslide__events {
+      display: flex; flex-wrap: wrap; gap: .45rem;
+      opacity: 0; transform: translateY(8px);
+      transition: opacity .55s .46s, transform .55s .46s;
+    }
+    .rslide.is-active .rslide__events { opacity: 1; transform: none; }
+    .rslide__events a, .rslide__events span {
+      font-family: var(--font-mono); font-size: .6rem; letter-spacing: .1em;
+      color: var(--muted); text-decoration: none;
+      border: 1px solid rgba(255,255,255,.12); border-radius: 100px;
+      padding: .28rem .75rem; transition: color .2s, border-color .2s;
+      backdrop-filter: blur(6px); background: rgba(10,14,12,.3);
+    }
+    .rslide__events a:hover { color: var(--green); border-color: rgba(61,220,111,.4); }
+    .rslide__events a.reveal-link { color: var(--gold); border-color: rgba(232,181,74,.35); }
+    .rslide__events a.worlds { color: var(--gold); border-color: rgba(232,181,74,.35); font-weight: 600; }
+
+    /* ── Nav bar ── */
+    .rcar-nav {
+      position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%);
+      display: flex; align-items: center; gap: 1rem; z-index: 45;
+      background: rgba(10,14,12,.72); backdrop-filter: blur(16px);
+      border: 1px solid var(--line); border-radius: 100px;
+      padding: .5rem 1.1rem;
+    }
+    .rcar-btn {
+      background: none; border: none; color: var(--muted); cursor: pointer;
+      padding: .15rem .35rem; font-size: 1rem; line-height: 1;
+      transition: color .2s; font-family: var(--font-mono);
+    }
+    .rcar-btn:hover:not(:disabled) { color: var(--green); }
+    .rcar-btn:disabled { opacity: .3; cursor: default; }
+    .rcar-dots { display: flex; gap: .4rem; }
+    .rcar-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: rgba(255,255,255,.2); border: none; padding: 0; cursor: pointer;
+      transition: background .3s, transform .3s;
+    }
+    .rcar-dot.is-active { background: var(--green); transform: scale(1.6); }
+    .rcar-counter {
+      font-family: var(--font-mono); font-size: .62rem; letter-spacing: .1em;
+      color: var(--muted); min-width: 3em; text-align: center;
+    }
+
+    /* ── Drag hint ── */
+    .drag-hint {
+      position: absolute; bottom: 6rem; right: clamp(1.5rem,4vw,3rem);
+      font-family: var(--font-mono); font-size: .6rem; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--muted-2);
+      display: flex; align-items: center; gap: .5rem;
+      animation: hint-bob 2.4s ease-in-out infinite;
+      opacity: 0; transition: opacity .4s .8s;
+    }
+    .rslide.is-active ~ * .drag-hint,
+    .drag-hint.show { opacity: 1; }
+    @keyframes hint-bob { 0%,100% { transform: translateX(0); } 50% { transform: translateX(6px); } }
   </style>
 </head>
 <body>
@@ -63,151 +174,261 @@
   </div>
 </header>
 
-<section class="robots-hero">
-  <div class="wrap">
-    <p class="robots-hero__kicker">FRC Team 5829 · Est. 2016</p>
-    <h1>10 Robots.<br><span style="color:var(--green)">10 Seasons.</span></h1>
-    <p>Every machine we've built — from our rookie year through the 2026 FIRST Championship.</p>
-  </div>
-</section>
+<div class="rcar-wrap" id="rcar-wrap">
+  <div class="rcar" id="rcar" role="region" aria-label="Robot fleet — use arrow keys or swipe to navigate">
 
-<section class="section" style="padding-top:1rem;">
-  <div class="wrap">
-    <div class="robots">
-
-      <div class="rbot has-img reveal" data-tilt>
-        <img class="rbot__img" src="assets/images/robot-goldfire-2026.jpg" alt="Goldfire 2026">
-        <div class="rbot__year">2026</div>
-        <div class="rbot__game">Reefscape℠</div>
-        <div class="rbot__name">Goldfire</div>
-        <div class="rbot__events">
+    <!-- 1 — Goldfire 2026 -->
+    <div class="rslide" data-idx="0">
+      <img class="rslide__bg" src="assets/images/robot-goldfire-2026.jpg" alt="Goldfire 2026" loading="eager">
+      <div class="rslide__overlay"></div>
+      <div class="rslide__watermark" aria-hidden="true">2026</div>
+      <div class="rslide__content">
+        <div class="rslide__num">Season 10 · Reefscape℠</div>
+        <h2 class="rslide__name"><span class="rslide__name-inner">Goldfire</span></h2>
+        <div class="rslide__game">Reefscape℠ · 2026</div>
+        <div class="rslide__events">
           <a href="https://www.thebluealliance.com/event/2026txmca" target="_blank">@ FIT McAllen</a>
           <a href="https://www.thebluealliance.com/event/2026txcl2" target="_blank">@ FIT Space City 2</a>
           <a href="https://www.thebluealliance.com/event/2026txcmp1" target="_blank">@ State Championships</a>
-          <a href="https://www.thebluealliance.com/event/2026arc" target="_blank">@ FIRST Championship (Archimedes)</a>
-          <a href="https://www.youtube.com/watch?v=BUQ0NH6PVAM" target="_blank" style="color:var(--gold);">▶ Robot Reveal</a>
+          <a href="https://www.thebluealliance.com/event/2026arc" target="_blank" class="worlds">★ FIRST Championship — Archimedes</a>
+          <a href="https://www.youtube.com/watch?v=BUQ0NH6PVAM" target="_blank" class="reveal-link">▶ Reveal Video</a>
         </div>
       </div>
+    </div>
 
-      <div class="rbot has-img reveal" data-tilt>
-        <img class="rbot__img" src="assets/images/robot-waverider-2025.png" alt="Waverider 2025">
-        <div class="rbot__year">2025</div>
-        <div class="rbot__game">Reefscape℠</div>
-        <div class="rbot__name">Waverider</div>
-        <div class="rbot__events">
+    <!-- 2 — Waverider 2025 -->
+    <div class="rslide" data-idx="1">
+      <img class="rslide__bg" src="assets/images/robot-waverider-2025.png" alt="Waverider 2025" loading="lazy">
+      <div class="rslide__overlay"></div>
+      <div class="rslide__watermark" aria-hidden="true">2025</div>
+      <div class="rslide__content">
+        <div class="rslide__num">Season 9 · Reefscape℠</div>
+        <h2 class="rslide__name"><span class="rslide__name-inner">Waverider</span></h2>
+        <div class="rslide__game">Reefscape℠ · 2025</div>
+        <div class="rslide__events">
           <a href="https://www.thebluealliance.com/event/2025txbel" target="_blank">@ FIT Belton</a>
           <a href="https://www.thebluealliance.com/event/2025txvic" target="_blank">@ FIT Victoria</a>
           <a href="https://www.thebluealliance.com/event/2025txcmp1" target="_blank">@ State Championships</a>
-          <a href="https://youtu.be/gssqTA2j7gg" target="_blank" style="color:var(--gold);">▶ Robot Reveal</a>
+          <a href="https://youtu.be/gssqTA2j7gg" target="_blank" class="reveal-link">▶ Reveal Video</a>
         </div>
       </div>
+    </div>
 
-      <div class="rbot has-img reveal" data-tilt>
-        <img class="rbot__img" src="assets/images/robot-jazz-2024.png" alt="Jazz 2024">
-        <div class="rbot__year">2024</div>
-        <div class="rbot__game">Crescendo℠</div>
-        <div class="rbot__name">Jazz</div>
-        <div class="rbot__events">
+    <!-- 3 — Jazz 2024 -->
+    <div class="rslide" data-idx="2">
+      <img class="rslide__bg" src="assets/images/robot-jazz-2024.png" alt="Jazz 2024" loading="lazy">
+      <div class="rslide__overlay"></div>
+      <div class="rslide__watermark" aria-hidden="true">2024</div>
+      <div class="rslide__content">
+        <div class="rslide__num">Season 8 · Crescendo℠</div>
+        <h2 class="rslide__name"><span class="rslide__name-inner">Jazz</span></h2>
+        <div class="rslide__game">Crescendo℠ · 2024</div>
+        <div class="rslide__events">
           <a href="https://www.thebluealliance.com/event/2024txkat" target="_blank">@ FIT Katy</a>
           <a href="https://www.thebluealliance.com/event/2024txsan" target="_blank">@ FIT San Antonio</a>
           <a href="https://www.thebluealliance.com/event/2024txcmp1" target="_blank">@ State Championships</a>
         </div>
       </div>
+    </div>
 
-      <div class="rbot has-img reveal" data-tilt>
-        <img class="rbot__img" src="assets/images/robot-greenlight-2023.png" alt="Greenlight 2023">
-        <div class="rbot__year">2023</div>
-        <div class="rbot__game">Charged Up℠</div>
-        <div class="rbot__name">Greenlight</div>
-        <div class="rbot__events">
+    <!-- 4 — Greenlight 2023 -->
+    <div class="rslide" data-idx="3">
+      <img class="rslide__bg" src="assets/images/robot-greenlight-2023.png" alt="Greenlight 2023" loading="lazy">
+      <div class="rslide__overlay"></div>
+      <div class="rslide__watermark" aria-hidden="true">2023</div>
+      <div class="rslide__content">
+        <div class="rslide__num">Season 7 · Charged Up℠</div>
+        <h2 class="rslide__name"><span class="rslide__name-inner">Greenlight</span></h2>
+        <div class="rslide__game">Charged Up℠ · 2023</div>
+        <div class="rslide__events">
           <a href="https://www.thebluealliance.com/event/2023txcha" target="_blank">@ FIT Channelview</a>
           <a href="https://www.thebluealliance.com/event/2023txsan" target="_blank">@ FIT San Antonio</a>
           <a href="https://www.thebluealliance.com/event/2023txcmp2" target="_blank">@ State Championships</a>
         </div>
       </div>
+    </div>
 
-      <div class="rbot has-img reveal" data-tilt>
-        <img class="rbot__img" src="assets/images/robot-topspin-2022.jpg" alt="Topspin 2022">
-        <div class="rbot__year">2022</div>
-        <div class="rbot__game">Rapid React℠</div>
-        <div class="rbot__name">Topspin</div>
-        <div class="rbot__events">
+    <!-- 5 — Topspin 2022 -->
+    <div class="rslide" data-idx="4">
+      <img class="rslide__bg" src="assets/images/robot-topspin-2022.jpg" alt="Topspin 2022" loading="lazy">
+      <div class="rslide__overlay"></div>
+      <div class="rslide__watermark" aria-hidden="true">2022</div>
+      <div class="rslide__content">
+        <div class="rslide__num">Season 6 · Rapid React℠</div>
+        <h2 class="rslide__name"><span class="rslide__name-inner">Topspin</span></h2>
+        <div class="rslide__game">Rapid React℠ · 2022</div>
+        <div class="rslide__events">
           <a href="https://www.thebluealliance.com/event/2022txcha" target="_blank">@ FIT Channelview</a>
           <a href="https://www.thebluealliance.com/event/2022txpas" target="_blank">@ FIT Pasadena</a>
           <a href="https://www.thebluealliance.com/event/2022txcmp2" target="_blank">@ State Championships</a>
         </div>
       </div>
+    </div>
 
-      <div class="rbot has-img reveal" data-tilt>
-        <img class="rbot__img" src="assets/images/robot-ironhide-2021.png" alt="Ironhide 2021">
-        <div class="rbot__year">2021 &amp; 2020</div>
-        <div class="rbot__game">Infinite Recharge℠</div>
-        <div class="rbot__name">Ironhide</div>
-        <div class="rbot__events">
+    <!-- 6 — Ironhide 2021 -->
+    <div class="rslide" data-idx="5">
+      <img class="rslide__bg" src="assets/images/robot-ironhide-2021.png" alt="Ironhide 2021" loading="lazy">
+      <div class="rslide__overlay"></div>
+      <div class="rslide__watermark" aria-hidden="true">2021</div>
+      <div class="rslide__content">
+        <div class="rslide__num">Season 5 · Infinite Recharge℠</div>
+        <h2 class="rslide__name"><span class="rslide__name-inner">Ironhide</span></h2>
+        <div class="rslide__game">Infinite Recharge℠ · 2020 & 2021</div>
+        <div class="rslide__events">
           <a href="https://www.thebluealliance.com/event/2020txdri" target="_blank">@ FIT Dripping Springs</a>
           <a href="https://www.thebluealliance.com/event/2020txcha" target="_blank">@ FIT Channelview</a>
         </div>
       </div>
+    </div>
 
-      <div class="rbot has-img reveal" data-tilt>
-        <img class="rbot__img" src="assets/images/robot-sideswipe-2019.png" alt="Sideswipe 2019">
-        <div class="rbot__year">2019</div>
-        <div class="rbot__game">Destination: Deep Space℠</div>
-        <div class="rbot__name">Sideswipe</div>
-        <div class="rbot__events">
+    <!-- 7 — Sideswipe 2019 -->
+    <div class="rslide" data-idx="6">
+      <img class="rslide__bg" src="assets/images/robot-sideswipe-2019.png" alt="Sideswipe 2019" loading="lazy">
+      <div class="rslide__overlay"></div>
+      <div class="rslide__watermark" aria-hidden="true">2019</div>
+      <div class="rslide__content">
+        <div class="rslide__num">Season 4 · Destination: Deep Space℠</div>
+        <h2 class="rslide__name"><span class="rslide__name-inner">Sideswipe</span></h2>
+        <div class="rslide__game">Destination: Deep Space℠ · 2019</div>
+        <div class="rslide__events">
           <a href="https://www.thebluealliance.com/event/2019txcha" target="_blank">@ FIT Channelview</a>
           <a href="https://www.thebluealliance.com/event/2019txgre" target="_blank">@ FIT Greenville</a>
         </div>
       </div>
+    </div>
 
-      <div class="rbot has-img reveal" data-tilt>
-        <img class="rbot__img" src="assets/images/robot-blurr-2018.png" alt="Blurr 2018">
-        <div class="rbot__year">2018</div>
-        <div class="rbot__game">FIRST Power Up℠</div>
-        <div class="rbot__name">Blurr</div>
-        <div class="rbot__events">
+    <!-- 8 — Blurr 2018 -->
+    <div class="rslide" data-idx="7">
+      <img class="rslide__bg" src="assets/images/robot-blurr-2018.png" alt="Blurr 2018" loading="lazy">
+      <div class="rslide__overlay"></div>
+      <div class="rslide__watermark" aria-hidden="true">2018</div>
+      <div class="rslide__content">
+        <div class="rslide__num">Season 3 · FIRST Power Up℠</div>
+        <h2 class="rslide__name"><span class="rslide__name-inner">Blurr</span></h2>
+        <div class="rslide__game">FIRST Power Up℠ · 2018</div>
+        <div class="rslide__events">
           <a href="https://www.thebluealliance.com/event/2018txho" target="_blank">@ Lone Star Central</a>
           <a href="https://www.thebluealliance.com/event/2018txpa" target="_blank">@ Lone Star South</a>
-          <a href="https://www.thebluealliance.com/event/2018carv" target="_blank">@ World Championships (Carver)</a>
+          <a href="https://www.thebluealliance.com/event/2018carv" target="_blank" class="worlds">★ FIRST Championship — Carver</a>
         </div>
       </div>
+    </div>
 
-      <div class="rbot has-img reveal" data-tilt>
-        <img class="rbot__img" src="assets/images/robot-bumblebee-2017.png" alt="Bumblebee 2017">
-        <div class="rbot__year">2017</div>
-        <div class="rbot__game">FIRST Steamworks℠</div>
-        <div class="rbot__name">Bumblebee</div>
-        <div class="rbot__events">
+    <!-- 9 — Bumblebee 2017 -->
+    <div class="rslide" data-idx="8">
+      <img class="rslide__bg" src="assets/images/robot-bumblebee-2017.png" alt="Bumblebee 2017" loading="lazy">
+      <div class="rslide__overlay"></div>
+      <div class="rslide__watermark" aria-hidden="true">2017</div>
+      <div class="rslide__content">
+        <div class="rslide__num">Season 2 · FIRST Steamworks℠</div>
+        <h2 class="rslide__name"><span class="rslide__name-inner">Bumblebee</span></h2>
+        <div class="rslide__game">FIRST Steamworks℠ · 2017</div>
+        <div class="rslide__events">
           <a href="https://www.thebluealliance.com/event/2017txlu" target="_blank">@ Hub City</a>
           <a href="https://www.thebluealliance.com/event/2017txho" target="_blank">@ Lone Star Central</a>
           <a href="https://www.thebluealliance.com/event/2017txwo" target="_blank">@ Lone Star North</a>
-          <a href="https://www.thebluealliance.com/event/2017tur" target="_blank">@ World Championships (Turing)</a>
-          <a href="https://www.youtube.com/watch?v=FuC6wsSAUl0" target="_blank" style="color:var(--gold);">▶ Robot Reveal</a>
+          <a href="https://www.thebluealliance.com/event/2017tur" target="_blank" class="worlds">★ FIRST Championship — Turing</a>
+          <a href="https://www.youtube.com/watch?v=FuC6wsSAUl0" target="_blank" class="reveal-link">▶ Reveal Video</a>
         </div>
       </div>
-
-      <div class="rbot has-img reveal" data-tilt>
-        <img class="rbot__img" src="assets/images/robot-crosshairs-2016.png" alt="Crosshairs 2016">
-        <div class="rbot__year">2016</div>
-        <div class="rbot__game">FIRST Stronghold℠</div>
-        <div class="rbot__name">Crosshairs</div>
-        <div class="rbot__events">
-          <a href="https://www.thebluealliance.com/event/2016lake" target="_blank">@ Bayou</a>
-          <a href="https://www.thebluealliance.com/event/2016txho" target="_blank">@ Lone Star</a>
-          <a href="https://www.youtube.com/watch?v=SLxID53bKQc" target="_blank" style="color:var(--gold);">▶ Robot Reveal</a>
-        </div>
-      </div>
-
     </div>
-  </div>
-</section>
 
-<footer class="foot">
-  <div class="wrap foot__in">
-    <p>AwtyBots · FRC Team 5829 © 2015–2026<br>awtyrobotics@gmail.com · Houston, TX</p>
-    <p>Live data: <a href="https://www.thebluealliance.com/team/5829" target="_blank">The Blue Alliance</a> · <a href="https://frc-events.firstinspires.org/team/5829" target="_blank">FIRST</a><br>Site maintained by the AwtyBots · <a href="#">Back to top ↑</a></p>
-  </div>
-</footer>
+    <!-- 10 — Crosshairs 2016 -->
+    <div class="rslide" data-idx="9">
+      <img class="rslide__bg" src="assets/images/robot-crosshairs-2016.png" alt="Crosshairs 2016" loading="lazy">
+      <div class="rslide__overlay"></div>
+      <div class="rslide__watermark" aria-hidden="true">2016</div>
+      <div class="rslide__content">
+        <div class="rslide__num">Season 1 · FIRST Stronghold℠</div>
+        <h2 class="rslide__name"><span class="rslide__name-inner">Crosshairs</span></h2>
+        <div class="rslide__game">FIRST Stronghold℠ · 2016 · Rookie Year</div>
+        <div class="rslide__events">
+          <a href="https://www.thebluealliance.com/event/2016lake" target="_blank">@ Bayou Regional</a>
+          <a href="https://www.thebluealliance.com/event/2016txho" target="_blank">@ Lone Star Regional</a>
+          <a href="https://www.youtube.com/watch?v=SLxID53bKQc" target="_blank" class="reveal-link">▶ Reveal Video</a>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /rcar -->
+</div><!-- /rcar-wrap -->
+
+<!-- floating drag hint on first slide -->
+<div class="drag-hint" id="drag-hint" aria-hidden="true">
+  <span>Drag or use arrows</span>
+  <svg width="18" height="10" viewBox="0 0 18 10" fill="none"><path d="M1 5h14M11 1l4 4-4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</div>
+
+<!-- persistent bottom nav -->
+<div class="rcar-nav" id="rcar-nav">
+  <button class="rcar-btn" id="rcar-prev" aria-label="Previous robot">←</button>
+  <div class="rcar-dots" id="rcar-dots"></div>
+  <span class="rcar-counter" id="rcar-counter">1 / 10</span>
+  <button class="rcar-btn" id="rcar-next" aria-label="Next robot">→</button>
+</div>
+
 <script src="assets/js/site.js"></script>
+<script>
+(function () {
+  const rcar    = document.getElementById('rcar');
+  const slides  = Array.from(rcar.querySelectorAll('.rslide'));
+  const dotsEl  = document.getElementById('rcar-dots');
+  const counter = document.getElementById('rcar-counter');
+  const prevBtn = document.getElementById('rcar-prev');
+  const nextBtn = document.getElementById('rcar-next');
+  const hint    = document.getElementById('drag-hint');
+  const total   = slides.length;
+  let current   = 0;
+  let scrolling = false;
+
+  // Build dot indicators
+  slides.forEach((_, i) => {
+    const d = document.createElement('button');
+    d.className = 'rcar-dot';
+    d.setAttribute('aria-label', `Robot ${i + 1}`);
+    d.addEventListener('click', () => goTo(i));
+    dotsEl.appendChild(d);
+  });
+
+  function goTo(idx) {
+    current = Math.max(0, Math.min(total - 1, idx));
+    rcar.scrollTo({ left: current * rcar.clientWidth, behavior: 'smooth' });
+    sync();
+  }
+
+  function sync() {
+    slides.forEach((s, i) => s.classList.toggle('is-active', i === current));
+    dotsEl.querySelectorAll('.rcar-dot').forEach((d, i) => d.classList.toggle('is-active', i === current));
+    counter.textContent = `${current + 1} / ${total}`;
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === total - 1;
+    if (current > 0 && hint) hint.style.display = 'none';
+  }
+
+  prevBtn.addEventListener('click', () => goTo(current - 1));
+  nextBtn.addEventListener('click', () => goTo(current + 1));
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft')  goTo(current - 1);
+    if (e.key === 'ArrowRight') goTo(current + 1);
+  });
+
+  // Detect snap position after scroll
+  let scrollTimer;
+  rcar.addEventListener('scroll', () => {
+    clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(() => {
+      const idx = Math.round(rcar.scrollLeft / rcar.clientWidth);
+      if (idx !== current) { current = idx; sync(); }
+    }, 80);
+  }, { passive: true });
+
+  // Init
+  sync();
+  slides[0].classList.add('is-active');
+  setTimeout(() => { if (hint) hint.classList.add('show'); }, 1200);
+  setTimeout(() => { if (hint) hint.style.opacity = '0'; }, 5000);
+})();
+</script>
 </body>
 </html>

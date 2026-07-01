@@ -7,21 +7,81 @@
   <link rel="icon" type="image/x-icon" href="assets/images/icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Saira:wght@500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Saira:wght@500;600;700;800;900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link href="assets/css/site.css" rel="stylesheet">
   <style>
-    .resource-card { border:1px solid var(--line); border-radius:14px; padding:1.8rem 2rem; background:var(--surface); margin-bottom:1.4rem; }
-    .resource-card h3 { font-family:var(--font-display); font-size:1.25rem; font-weight:700; margin-bottom:.6rem; }
-    .resource-card p { color:var(--muted); margin-bottom:1rem; }
-    .resource-card a.card-link { color:var(--green); font-family:var(--font-display); font-weight:600; text-decoration:none; }
-    .resource-card a.card-link:hover { text-decoration:underline; }
-    .social-list { list-style:none; display:flex; flex-direction:column; gap:.6rem; }
-    .social-list a { display:flex; align-items:center; gap:.9rem; padding:.75rem 1rem; border-radius:10px; border:1px solid var(--line); background:var(--surface); text-decoration:none; color:var(--text); transition:border-color .2s,background .2s; }
-    .social-list a:hover { border-color:var(--green); background:rgba(61,220,111,.06); }
-    .social-list img { width:36px; height:36px; object-fit:contain; border-radius:6px; }
-    .social-list span { font-family:var(--font-display); font-size:.95rem; font-weight:600; color:var(--green); }
-    .resources-grid { display:grid; grid-template-columns:1fr; gap:2rem; }
-    @media(min-width:768px) { .resources-grid { grid-template-columns:1fr 280px; } }
+    /* ── World map ── */
+    .world-map-wrap {
+      position: relative;
+      width: 100%; border-radius: 16px;
+      overflow: hidden; margin-bottom: 3rem;
+      border: 1px solid var(--line);
+      background: #080c0a;
+    }
+    #world-map {
+      display: block; width: 100%;
+      height: clamp(200px, 40vw, 400px);
+    }
+    .map-legend {
+      position: absolute; bottom: 1rem; left: 1.2rem;
+      font-family: var(--font-mono); font-size: .6rem;
+      letter-spacing: .14em; text-transform: uppercase;
+      color: rgba(61,220,111,.6);
+      display: flex; align-items: center; gap: .55rem;
+    }
+    .map-legend::before {
+      content: ""; width: 8px; height: 8px; border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      flex-shrink: 0;
+    }
+    .map-counter {
+      position: absolute; top: 1rem; right: 1.2rem;
+      font-family: var(--font-display); font-weight: 900;
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      letter-spacing: -.03em; color: var(--green);
+      line-height: 1;
+    }
+    .map-counter small {
+      display: block; font-family: var(--font-mono);
+      font-size: .6rem; font-weight: 400; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--muted);
+      margin-top: .2rem;
+    }
+
+    /* ── Resource cards ── */
+    .resource-card {
+      border: 1px solid var(--line); border-radius: 14px;
+      padding: 1.8rem 2rem; background: var(--surface);
+      margin-bottom: 1.2rem;
+      transition: border-color .2s;
+    }
+    .resource-card:hover { border-color: rgba(61,220,111,.3); }
+    .resource-card h3 { font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; margin-bottom: .6rem; }
+    .resource-card p { color: var(--muted); margin-bottom: 1rem; line-height: 1.7; }
+    .resource-card a.card-link {
+      color: var(--green); font-family: var(--font-display);
+      font-weight: 600; text-decoration: none;
+      display: inline-flex; align-items: center; gap: .4rem;
+      transition: gap .2s;
+    }
+    .resource-card a.card-link:hover { gap: .7rem; }
+
+    /* ── Social list ── */
+    .social-list { list-style: none; display: flex; flex-direction: column; gap: .6rem; }
+    .social-list a {
+      display: flex; align-items: center; gap: .9rem;
+      padding: .75rem 1rem; border-radius: 10px;
+      border: 1px solid var(--line); background: var(--surface);
+      text-decoration: none; color: var(--text);
+      transition: border-color .2s, background .2s, transform .2s;
+    }
+    .social-list a:hover { border-color: var(--green); background: rgba(61,220,111,.06); transform: translateX(4px); }
+    .social-list img { width: 28px; height: 28px; object-fit: contain; border-radius: 5px; }
+    .social-list span { font-family: var(--font-display); font-size: .95rem; font-weight: 600; color: var(--green); }
+
+    .resources-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
+    @media(min-width:768px) { .resources-grid { grid-template-columns: 1fr 260px; } }
   </style>
 </head>
 <body>
@@ -43,62 +103,79 @@
   </div>
 </header>
 
-<section class="section" style="padding-top:6rem;padding-bottom:2rem;text-align:center;">
+<section class="section" style="padding-top:6rem;padding-bottom:2rem;">
   <div class="wrap">
-    <h1 style="font-family:var(--font-display);font-size:clamp(2rem,5vw,3.5rem);font-weight:800;margin-bottom:.75rem;">Resources</h1>
-    <p style="color:var(--muted);font-size:1.1rem;">Community initiatives and materials from the AwtyBots.</p>
-  </div>
-</section>
 
-<section class="section" style="padding-top:1rem;">
-  <div class="wrap">
+    <p class="eyebrow" style="margin-bottom:.8rem;">Open Resources</p>
+    <h1 class="reveal" style="font-family:var(--font-display);font-size:clamp(2.5rem,7vw,5rem);font-weight:900;letter-spacing:-.04em;line-height:.95;margin-bottom:1rem;">
+      Built to share.
+    </h1>
+    <p style="color:var(--muted);font-size:1rem;margin-bottom:2.5rem;max-width:52ch;">
+      Everything we make — code, translations, hardware guides — is open for any team to use.
+    </p>
+
+    <!-- World map -->
+    <div class="world-map-wrap reveal">
+      <canvas id="world-map" aria-label="World map showing countries reached by Project Translate"></canvas>
+      <div class="map-legend">Project Translate reach</div>
+      <div class="map-counter">
+        <span id="map-count">0</span>
+        <small>countries</small>
+      </div>
+    </div>
+
     <div class="resources-grid">
-
-      <div id="outreach-content">
-        <div class="resource-card">
+      <div>
+        <div class="resource-card reveal">
           <h3 style="color:var(--gold);">Project Translate</h3>
-          <p>Project Translate is our mission to transcribe different FRC documents into various languages, to make robotics available to anyone.</p>
-          <a class="card-link" href="translate.html">View Project Translate &rarr;</a>
+          <p>Our mission to transcribe FRC technical documents into multiple languages — making competitive robotics accessible to teams around the world regardless of language barrier.</p>
+          <a class="card-link" href="translate.html">View translations →</a>
         </div>
 
-        <div class="resource-card">
+        <div class="resource-card reveal">
           <h3 style="color:var(--green);">Belt Organizers</h3>
-          <p>Our solution to organize belts within our lab, and how you can implement them!</p>
-          <a class="card-link" href="belts.html">View Belt Organizer Instructions &rarr;</a>
+          <p>We laser-cut custom HTD belt organizers for our lab and documented the full process — CAD files, Illustrator setup, laser settings — so any team can replicate it.</p>
+          <a class="card-link" href="belts.html">Step-by-step guide →</a>
+        </div>
+
+        <div class="resource-card reveal">
+          <h3>Robot Code</h3>
+          <p>All of our robot code is open source on GitHub — autonomous routines, subsystem implementations, and utility tooling going back multiple seasons.</p>
+          <a class="card-link" href="https://github.com/awtybots" target="_blank" rel="noopener">View on GitHub →</a>
         </div>
       </div>
 
       <aside>
-        <h3 style="font-family:var(--font-display);font-size:1.1rem;font-weight:700;margin-bottom:1rem;color:var(--muted);">Find Us Online</h3>
+        <h3 style="font-family:var(--font-display);font-size:1rem;font-weight:700;margin-bottom:1rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;">Find Us Online</h3>
         <ul class="social-list">
           <li>
             <a href="https://www.youtube.com/@Awtybots5829" target="_blank">
-              <img src="assets/images/youtube.png" alt="YouTube">
+              <img src="assets/images/youtube.png" alt="">
               <span>YouTube</span>
             </a>
           </li>
           <li>
             <a href="https://www.instagram.com/awtybots5829/" target="_blank">
-              <img src="assets/images/instagram.png" alt="Instagram">
+              <img src="assets/images/instagram.png" alt="">
               <span>Instagram</span>
             </a>
           </li>
           <li>
             <a href="https://github.com/awtybots" target="_blank">
-              <img src="assets/images/github.png" alt="GitHub">
+              <img src="assets/images/github.png" alt="">
               <span>GitHub</span>
             </a>
           </li>
           <li>
             <a href="https://www.facebook.com/AwtyBots5829/" target="_blank">
-              <img src="assets/images/facebook.png" alt="Facebook">
+              <img src="assets/images/facebook.png" alt="">
               <span>Facebook</span>
             </a>
           </li>
         </ul>
       </aside>
-
     </div>
+
   </div>
 </section>
 
@@ -108,7 +185,159 @@
     <p>Live data: <a href="https://www.thebluealliance.com/team/5829" target="_blank">The Blue Alliance</a> · <a href="https://frc-events.firstinspires.org/team/5829" target="_blank">FIRST</a><br>Site maintained by the AwtyBots · <a href="#">Back to top ↑</a></p>
   </div>
 </footer>
-<script src="assets/js/site.js"></script>
 
+<script src="assets/js/site.js"></script>
+<script>
+(function () {
+  const canvas = document.getElementById('world-map');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  // Countries reached by Project Translate [lat, lon, name]
+  const countries = [
+    [38, -97,   'USA'],
+    [20,  77,   'India'],
+    [52,  20,   'Poland'],
+    [54,  -3,   'UK'],
+    [35,  38,   'Syria'],
+    [15, 101,   'Thailand'],
+    [56, -96,   'Canada'],
+    [40,  45,   'Armenia'],
+    [35, 104,   'China'],
+    [ 8, -66,   'Venezuela'],
+    [40,  -4,   'Spain'],
+    [52,   5,   'Netherlands'],
+    [ 4, 109,   'Malaysia'],
+    [30,  69,   'Pakistan'],
+    [60,  90,   'Russia'],
+    [ 1, 104,   'Singapore'],
+    [-25, 133,  'Australia'],
+    [42,   1.5, 'Andorra'],
+    [37, 128,   'South Korea'],
+    [47,  14,   'Austria'],
+    [51,  10,   'Germany'],
+    [ 4, -72,   'Colombia'],
+    [ 9, -80,   'Panama'],
+    [-34, -64,  'Argentina'],
+    [12, 123,   'Philippines'],
+    [14, 108,   'Vietnam'],
+    [47,   8,   'Switzerland'],
+    [42,  12,   'Italy'],
+    [32,  53,   'Iran'],
+  ];
+
+  const GREEN = '#3ddc6f';
+  const GRID  = 'rgba(61,220,111,.06)';
+  const DOT_R = 4;
+
+  function project(lat, lon, w, h) {
+    const x = ((lon + 180) / 360) * w;
+    const y = ((90 - lat) / 180) * h;
+    return [x, y];
+  }
+
+  function resize() {
+    canvas.width  = canvas.offsetWidth  * window.devicePixelRatio;
+    canvas.height = canvas.offsetHeight * window.devicePixelRatio;
+    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  }
+
+  function drawGrid(w, h) {
+    ctx.strokeStyle = GRID;
+    ctx.lineWidth = 1;
+    // latitude lines every 30°
+    for (let lat = -60; lat <= 90; lat += 30) {
+      const y = ((90 - lat) / 180) * h;
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+    }
+    // longitude lines every 60°
+    for (let lon = -180; lon <= 180; lon += 60) {
+      const x = ((lon + 180) / 360) * w;
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+    }
+  }
+
+  let revealed = 0;
+  let pulses = []; // {x, y, r, alpha}
+  let animating = false;
+
+  function drawDot(x, y, alpha) {
+    // glow
+    const grad = ctx.createRadialGradient(x, y, 0, x, y, DOT_R * 5);
+    grad.addColorStop(0, `rgba(61,220,111,${alpha * 0.35})`);
+    grad.addColorStop(1, 'rgba(61,220,111,0)');
+    ctx.beginPath();
+    ctx.arc(x, y, DOT_R * 5, 0, Math.PI * 2);
+    ctx.fillStyle = grad;
+    ctx.fill();
+    // core
+    ctx.beginPath();
+    ctx.arc(x, y, DOT_R, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(61,220,111,${alpha})`;
+    ctx.fill();
+  }
+
+  function render() {
+    const W = canvas.offsetWidth;
+    const H = canvas.offsetHeight;
+    ctx.clearRect(0, 0, W, H);
+    drawGrid(W, H);
+
+    // draw revealed dots
+    for (let i = 0; i < revealed; i++) {
+      const [lat, lon] = countries[i];
+      const [x, y] = project(lat, lon, W, H);
+      drawDot(x, y, 1);
+    }
+
+    // pulse rings
+    pulses = pulses.filter(p => p.alpha > 0.01);
+    pulses.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(61,220,111,${p.alpha})`;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      p.r   += 1.8;
+      p.alpha *= 0.92;
+    });
+
+    if (animating) requestAnimationFrame(render);
+  }
+
+  function startAnimation() {
+    if (animating) return;
+    animating = true;
+    requestAnimationFrame(render);
+
+    const counter = document.getElementById('map-count');
+    let i = 0;
+    function revealNext() {
+      if (i >= countries.length) {
+        setTimeout(() => { animating = false; }, 800);
+        return;
+      }
+      revealed = i + 1;
+      const [lat, lon] = countries[i];
+      const W = canvas.offsetWidth, H = canvas.offsetHeight;
+      const [x, y] = project(lat, lon, W, H);
+      pulses.push({ x, y, r: DOT_R, alpha: 0.9 });
+      if (counter) counter.textContent = revealed;
+      i++;
+      setTimeout(revealNext, 80);
+    }
+    setTimeout(revealNext, 300);
+  }
+
+  resize();
+  window.addEventListener('resize', () => { resize(); if (!animating) render(); });
+
+  // Trigger when map enters viewport
+  const io = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting) { startAnimation(); io.disconnect(); }
+  }, { threshold: 0.3 });
+  io.observe(canvas);
+})();
+</script>
 </body>
 </html>

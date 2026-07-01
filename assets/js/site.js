@@ -237,3 +237,92 @@
   }, { threshold: 0.5 });
   counters.forEach(el => io.observe(el));
 })();
+
+/* ── PAGE TRANSITIONS ──────────────────────────────────────── */
+(function () {
+  const overlay = document.createElement('div');
+  overlay.id = 'pt';
+  overlay.style.cssText = [
+    'position:fixed','inset:0','z-index:99999',
+    'background:var(--bg)','pointer-events:none',
+    'transform:translateX(-101%)','will-change:transform'
+  ].join(';');
+  document.body.appendChild(overlay);
+
+  // Sweep in → navigate → sweep out pattern
+  function sweep(cb) {
+    overlay.style.transition = 'transform .32s cubic-bezier(.76,0,.24,1)';
+    overlay.style.transform  = 'translateX(0)';
+    overlay.addEventListener('transitionend', function done() {
+      overlay.removeEventListener('transitionend', done);
+      cb();
+    });
+  }
+
+  function sweepOut() {
+    overlay.style.transition = 'transform .38s cubic-bezier(.76,0,.24,1)';
+    overlay.style.transform  = 'translateX(101%)';
+    overlay.addEventListener('transitionend', function done() {
+      overlay.removeEventListener('transitionend', done);
+      overlay.style.transform = 'translateX(-101%)';
+      overlay.style.transition = 'none';
+    });
+  }
+
+  // Intercept same-origin link clicks
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a');
+    if (!a) return;
+    const href = a.getAttribute('href');
+    if (!href) return;
+    // skip: external, hash-only, new tab, mailto, tel
+    if (a.target === '_blank') return;
+    if (href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:')) return;
+    if (href.startsWith('http') && !href.startsWith(location.origin)) return;
+    e.preventDefault();
+    sweep(() => { window.location.href = href; });
+  });
+
+  // On page load, sweep out
+  window.addEventListener('pageshow', () => {
+    sweepOut();
+  });
+})();
+
+/* ── MAGNETIC BUTTONS ──────────────────────────────────────── */
+(function () {
+  function magnetize(el) {
+    el.addEventListener('mousemove', e => {
+      const r  = el.getBoundingClientRect();
+      const dx = e.clientX - (r.left + r.width  / 2);
+      const dy = e.clientY - (r.top  + r.height / 2);
+      el.style.transform  = `translate(${dx * 0.28}px, ${dy * 0.28}px)`;
+      el.style.transition = 'transform .1s linear';
+    });
+    el.addEventListener('mouseleave', () => {
+      el.style.transform  = '';
+      el.style.transition = 'transform .55s cubic-bezier(.22,.61,.36,1)';
+    });
+  }
+
+  // Apply to CTA buttons and nav CTA — defer until DOM ready
+  document.querySelectorAll('.btn--solid, .nav__cta, .rcar-btn').forEach(magnetize);
+})();
+
+/* ── CINEMATIC INNER-PAGE H1 ───────────────────────────────── */
+(function () {
+  // Only run on pages that aren't the home scroll-video hero
+  if (document.getElementById('svid-wrap')) return;
+
+  const h1 = document.querySelector('h1.reveal, h1.page-hero-title, .robots-hero h1');
+  if (!h1) return;
+
+  // Wrap each word in a clip container so it slides up
+  const html = h1.innerHTML;
+  // Split on spaces but preserve spans/tags — simple word split on text nodes only
+  h1.style.overflow = 'visible';
+
+  // Instead: just add a fast reveal class and let the existing .reveal system handle it,
+  // but also add a letter-by-letter shimmer via CSS custom property
+  h1.classList.add('reveal', 'page-h1-cin');
+})();
