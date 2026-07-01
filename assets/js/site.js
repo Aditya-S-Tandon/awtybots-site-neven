@@ -160,3 +160,80 @@
     flags.appendChild(row);
   }
 })();
+
+/* ── CURSOR GLOW ─────────────────────────────────────────── */
+(function () {
+  const blob = document.createElement('div');
+  blob.id = 'cursor-glow';
+  blob.style.cssText = [
+    'position:fixed',
+    'pointer-events:none',
+    'z-index:9999',
+    'width:340px',
+    'height:340px',
+    'border-radius:50%',
+    'transform:translate(-50%,-50%)',
+    'transition:opacity .4s',
+    'opacity:0',
+    'will-change:left,top'
+  ].join(';');
+  document.body.appendChild(blob);
+
+  let mx = window.innerWidth / 2, my = window.innerHeight / 2;
+  let bx = mx, by = my;
+  let raf;
+
+  // color zones: top ~40% = gold, rest = green
+  function getColor(y) {
+    const frac = y / window.innerHeight;
+    return frac < 0.42
+      ? 'rgba(232,181,74,0.13)'   // gold — top of page (hero)
+      : 'rgba(61,220,111,0.10)';  // green — rest
+  }
+
+  function lerp(a, b, t) { return a + (b - a) * t; }
+
+  function frame() {
+    bx = lerp(bx, mx, 0.065);
+    by = lerp(by, my, 0.065);
+    const color = getColor(by);
+    blob.style.left = bx + 'px';
+    blob.style.top  = by + 'px';
+    blob.style.background = `radial-gradient(circle, ${color} 0%, transparent 70%)`;
+    raf = requestAnimationFrame(frame);
+  }
+
+  window.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    blob.style.opacity = '1';
+  }, { passive: true });
+
+  window.addEventListener('mouseleave', () => { blob.style.opacity = '0'; });
+
+  frame();
+})();
+
+/* ── ANIMATED STAT COUNTERS ──────────────────────────────── */
+(function () {
+  const counters = document.querySelectorAll('[data-count]');
+  if (!counters.length) return;
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+      const target = +el.dataset.count;
+      const dur = 1200;
+      const start = performance.now();
+      function tick(now) {
+        const t = Math.min(1, (now - start) / dur);
+        const ease = 1 - Math.pow(1 - t, 3);
+        el.textContent = Math.round(ease * target);
+        if (t < 1) requestAnimationFrame(tick);
+        else el.textContent = target;
+      }
+      requestAnimationFrame(tick);
+      io.unobserve(el);
+    });
+  }, { threshold: 0.5 });
+  counters.forEach(el => io.observe(el));
+})();
