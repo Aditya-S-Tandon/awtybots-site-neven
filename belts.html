@@ -72,7 +72,9 @@
   function addPost(text) {
     const article = document.createElement('article');
     const rec = document.createElement('div');
-    rec.innerHTML = marked.parse(text);
+    // Rewrite absolute image paths to relative so they work on any base URL
+    const fixed = text.replace(/!\[([^\]]*)\]\(\/outreach\//g, '![$1](outreach/');
+    rec.innerHTML = marked.parse(fixed);
     article.appendChild(rec);
     document.getElementById('post').replaceChildren(article);
   }
